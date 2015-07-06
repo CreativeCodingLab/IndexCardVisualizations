@@ -15,6 +15,10 @@ var includes = function(string, match) {
 
 var collection = db.get('index_cards');
 
+// collection.count().then(function(d) { console.log(d) })
+
+// collection.find().then(console.log)
+
 function readCards(parent) {
     var files = readdir(parent)
         .filter(function(dir_name) {
