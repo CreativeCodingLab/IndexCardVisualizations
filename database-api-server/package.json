@@ -1,6 +1,9 @@
 {
   "private": true,
   "dependencies": {
-    "express": "^4.13.1"
+    "bluebird": "^2.9.33",
+    "body-parser": "^1.13.2",
+    "express": "^4.13.1",
+    "mongodb": "^2.0.36"
   }
 }
