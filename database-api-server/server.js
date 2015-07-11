@@ -9,6 +9,26 @@ var db_url = "mongodb://127.0.0.1:27017/" + db_name;
 
 var db = MongoClient.connect(db_url);
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+var i = 0;
+
+app.get("/matches/score-above-zero-stream.json", function(request, response) {
+    response.write("[")
+    db.then(function(db) {
+        return db.collection("card_matches").find({ score: { $gt: 0 } })
+            .stream({ transform: function(doc) { return JSON.stringify(doc); }});
+    })
+    .then(function(stream) {
+        stream.once("end", function() { response.write("]"); response.end() });
+        stream.on("data", function(d) { response.write(d); response.write(",") });
+    })
+});
+
 app.get("/matches/score-above-zero.json", function(request, response) {
     db.then(function(db) {
         return db.collection("card_matches").find({ score: { $gt: 0 } }).toArray()
