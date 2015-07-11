@@ -58,12 +58,18 @@ go = () ->
                 link = { source: source_fries, target: target_pc, match_data: match_data }
                 links.push link
 
-            updateLinks(links)
-            updatePc(pc)
-            updateFries(fries)
+            updateAll()
         )
 
 window.onload = go
+
+updateAll = () ->
+    updateLinks(links)
+    updatePc(pc)
+    updateFries(fries)
+
+# updateAll = _.debounce(updateAll, 500, true);
+updateAll = _.throttle(updateAll, 800);
 
 updateLinks = (links) ->
     items = links_list.selectAll("li").data(links)
@@ -77,8 +83,6 @@ updatePc = (pc) ->
 
     items.enter().append("li").text((d) -> d._id)
         .style({ "font-size": "0.5em", opacity: 0 })
-        # .transition("new")
-        # .duration(500)
         .style({ opacity: 1 })
 
 updateFries = (fries) ->
@@ -88,6 +92,7 @@ updateFries = (fries) ->
         .style({ "font-size": "0.5em", opacity: 0 })
         # .transition("new")
         # .duration(500)
+        # .delay((d, i) -> i * 50)
         .style({ opacity: 1 })
 
 # updateFries = _.debounce(updateFries, 50)
