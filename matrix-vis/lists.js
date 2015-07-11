@@ -88,7 +88,7 @@
     return updateFries(fries);
   };
 
-  updateAll = _.throttle(updateAll, 800);
+  updateAll = _.throttle(updateAll, 500);
 
   updateLinks = function(links) {
     var items;

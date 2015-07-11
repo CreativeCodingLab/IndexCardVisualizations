@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "oboe": "~2.1.2"
+  }
+}

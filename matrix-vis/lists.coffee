@@ -68,8 +68,7 @@ updateAll = () ->
     updatePc(pc)
     updateFries(fries)
 
-# updateAll = _.debounce(updateAll, 500, true);
-updateAll = _.throttle(updateAll, 800);
+updateAll = _.throttle(updateAll, 500);
 
 updateLinks = (links) ->
     items = links_list.selectAll("li").data(links)
@@ -94,5 +93,3 @@ updateFries = (fries) ->
         # .duration(500)
         # .delay((d, i) -> i * 50)
         .style({ opacity: 1 })
-
-# updateFries = _.debounce(updateFries, 50)
