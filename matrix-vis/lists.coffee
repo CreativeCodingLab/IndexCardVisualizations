@@ -39,6 +39,7 @@ go = () ->
             keep_fries_keys.forEach (key) -> new_card[key] = card[key]
             index = bisect(fries, new_card)
             fries.splice(index, 0, new_card)
+            # assert(fries[index] is new_card)
 
             # Find or push new pc cards and new links
             card.match.forEach (match) ->
