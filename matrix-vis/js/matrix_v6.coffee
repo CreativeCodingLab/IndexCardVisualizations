@@ -33,7 +33,7 @@ container.selectAll("li")
             d3.select(this).select("a").append("span").text(" (demonstrates scaling issues)")
     
     
-main = container.append("div").classed("row", true)
+#main = container.append("div").classed("row", true)
 
 vis_row = container.append("div").classed("row", true)
     
@@ -90,12 +90,18 @@ keep_match_keys = ["deltaFeature", "potentialConflict", "participantA", "score"]
 
 i = 0
 
+existing_oboe = null
+
 doSearch = (url) ->
     fries = []
     pc = []
     links = []
     matrix_container.selectAll(".row").remove()
-    oboe(url)
+    
+    if existing_oboe?
+        existing_oboe.abort()
+        
+    existing_oboe = oboe(url)
         .node("!.*", (card) ->
 
             # Add to fries
@@ -132,8 +138,8 @@ doSearch = (url) ->
 x = d3.scale.ordinal()
 y = d3.scale.ordinal()
 
-cell_spacing = 0.15
-cell_padding = 2
+cell_spacing = 0
+cell_padding = 0
 
 updateAll = ->
     cell_size = parseInt(svg.style("width")) / pc.length
@@ -141,6 +147,8 @@ updateAll = ->
     
     y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], cell_spacing)
     x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], cell_spacing)
+
+    svg.style({ height: cell_size * fries.length })
 
     updateRows(fries)
     updateColumns(pc)
@@ -150,6 +158,8 @@ updateAll = _.throttle(updateAll, 100);
 font_size = "9px"
 
 color = d3.scale.category10()
+
+score_scale = d3.scale.linear().domain([0,10]).range([0,0.7])
 
 getOne = (json) ->
     return new Promise (resolve) ->
@@ -205,11 +215,11 @@ updateRows = (fries) ->
             x: cell_padding/2, 
             y: cell_padding/2 
         })
-        .style({ opacity: 0.7 })
+        .style({ opacity: (d) -> score_scale(d.match_data.score) })
         .style({ 
-            stroke: (d) -> color(d.match_data.deltaFeature),
-            "stroke-width": x.rangeBand() * 0.3,
-            fill: (d) -> if d.match_data.potentialConflict then "none" else color(d.match_data.deltaFeature)
+            #stroke: (d) -> color(d.match_data.deltaFeature),
+            #"stroke-width": x.rangeBand() * 0.3,
+            fill: (d) -> if d.match_data.potentialConflict then "red" else color(d.match_data.deltaFeature)
         })
 
 updateColumns = (pc) ->

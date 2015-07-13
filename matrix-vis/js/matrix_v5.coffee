@@ -142,6 +142,8 @@ updateAll = ->
     y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], cell_spacing)
     x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], cell_spacing)
 
+    svg.style({ height: cell_size * fries.length })
+
     updateRows(fries)
     updateColumns(pc)
 
@@ -150,6 +152,8 @@ updateAll = _.throttle(updateAll, 100);
 font_size = "9px"
 
 color = d3.scale.category10()
+
+score_scale = d3.scale.linear().domain([0,10]).range([0,1])
 
 getOne = (json) ->
     return new Promise (resolve) ->
@@ -205,7 +209,7 @@ updateRows = (fries) ->
             x: cell_padding/2, 
             y: cell_padding/2 
         })
-        .style({ opacity: 0.7 })
+        .style({ opacity: (d) -> score_scale(d.match_data.score) })
         .style({ 
             stroke: (d) -> color(d.match_data.deltaFeature),
             "stroke-width": x.rangeBand() * 0.3,

@@ -6,7 +6,7 @@
     "padding-top": "10px"
   }).append("row");
 
-  url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/200";
+  url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/400";
 
   margin = {
     top: 200,
