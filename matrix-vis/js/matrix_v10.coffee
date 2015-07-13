@@ -49,10 +49,17 @@ addButtons = (container) ->
             label.append("input").attr({ type: "radio", name: "data" })
 
     panel_body.append("button").classed("btn btn-default", true)
-        .text("FRIES cards with potential conflicts and less than 100 matches.")
+        .text("FRIES cards with potential conflicts")
         .on("click", ->
             d3.select(".search-buttons").selectAll("label").classed("active", false)
             doSearch("//bostock.evl.uic.edu:8080/all-with-conflict")
+        )
+
+    panel_body.append("button").classed("btn btn-default", true)
+        .text('FRIES cards with "superset" delta feature')
+        .on("click", ->
+            d3.select(".search-buttons").selectAll("label").classed("active", false)
+            doSearch("//bostock.evl.uic.edu:8080/all-with-delta-feature/superset")
         )
 
 translate = (x, y) -> "translate (#{x},#{y})"
@@ -129,7 +136,7 @@ updateAll = ->
         .append("text").text((d) -> d.toUpperCase())
     _wid = pc_title.select("text").node().getBBox().width
     pc_title.attr({
-        transform: translate(margin.left + matrix_width/2 - _wid/2, 10)
+        transform: translate(margin.left + matrix_width/2 - _wid/2, 12)
     })
 
     fries_title = svg.selectAll(".rows-title").data(["fries"])
@@ -139,7 +146,7 @@ updateAll = ->
     fries_title.attr({
         transform: ->
             h = parseInt(svg.style("height")) - margin.top
-            translate(10, margin.top + h/2 + _wid_2/2) + "rotate(-90)"
+            translate(12, margin.top + h/2 + _wid_2/2) + "rotate(-90)"
     })
 
     updateRows(fries)
@@ -162,6 +169,9 @@ getOne = (json) ->
 
 mouseover = (d) ->
     d3.select(this).classed("highlight", true)
+        .each(setText)
+
+setText = (d) ->
     getOne({ _id: d.source._id, collection: "fries_cards" })
         .then (d) ->
             json = JSON.parse(d.response)
@@ -170,6 +180,7 @@ mouseover = (d) ->
             d3.select(".fries-data .text").text(text)
             d3.select(".fries-data").selectAll("tr")
                 .each setHoverData(json)
+            d3.select(".fries-data")
 
     getOne({ _id: d.target._id, collection: "pc_cards" })
         .then (d) ->
@@ -197,13 +208,24 @@ setHoverData = (data) ->
         if row.key is "potentialConflict"
             td.style({ color: (d) -> if string is true then "red" else "black" })
 
-mouseout = (d) ->
-    d3.select(this).classed("highlight", false)
+clearText = ->
     d3.select(".fries-data .text").text("")
     d3.select(".fries-data").selectAll(".hover-data").text("")
     d3.select(".pc-data .text").text("")
     d3.select(".pc-data").selectAll(".hover-data").text("")
     d3.select(".match-data").selectAll(".hover-data").text("")
+
+mouseout = (d) ->
+    d3.select(this).classed("highlight", false)
+    _clicked = d3.select(".clicked")
+    if _clicked.size()
+        _clicked.each(setText)
+    else
+        clearText()
+
+click = (d) ->
+    d3.selectAll(".cell").classed("clicked", false)
+    d3.select(this).classed("clicked", true)
 
 updateRows = (fries) ->
     rows = rows_container.selectAll(".row").data(fries)
@@ -225,6 +247,7 @@ updateRows = (fries) ->
     cells.enter().append("g").classed("cell", true)
         .on("mouseover", mouseover)
         .on("mouseout", mouseout)
+        .on("click", click)
         .append("rect")
 
     cells.attr({
@@ -241,9 +264,11 @@ updateRows = (fries) ->
             x: cell_padding/2,
             y: cell_padding/2
         })
-        .style({ opacity: (d) -> score_scale(d.match_data.score) })
+        .style({ "fill-opacity": (d) -> score_scale(d.match_data.score) })
         .style({
-            fill: (d) -> if d.match_data.potentialConflict then "red" else color(d.match_data.deltaFeature)
+            fill: (d) -> if d.match_data.potentialConflict then "red" else color(d.match_data.deltaFeature),
+            stroke: (d) -> if d.match_data.potentialConflict then "red" else "none",
+            "stroke-opacity": 1
         })
 
 updateColumns = (pc) ->
@@ -321,6 +346,7 @@ vis_row.append("div").classed("col-xs-5", true)
     .enter().append("div")
     .attr("class", (d) -> d.klass)
     .classed("panel panel-default", true)
+    .style({ height: "250px", overflow: "scroll" })
     .call (div) ->
         div.append("div").classed("panel-heading", true)
             .text((d) -> d.label)
@@ -333,12 +359,13 @@ vis_row.append("div").classed("col-xs-5", true)
 
         div.append("div").classed("panel-body", true)
 
-        #div.append("pre").classed("text", true)
-            #.style({ height: "250px", overflow: "scroll" })
+        div.append("pre").classed("text", true)
     .each (d) ->
         if d.klass is "match-data"
             d3.select(this).select("pre").remove()
             d3.select(this).select(".panel-body").remove()
+            d3.select(this).style({ height: "inherit" })
+            d3.select(this).select(".panel-heading").remove()
 
 svg = matrix_panel.append("svg")
     .attr({
