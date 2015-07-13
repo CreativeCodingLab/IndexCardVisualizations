@@ -21,6 +21,22 @@ app.get("/foo/:limit", function(request, response) {
     response.end(request.params.limit);
 })
 
+app.post("/get-one", bodyParser, function(request, response) {
+    response.end("ack");
+    // response.end(request.body)
+    // response.write("[")
+    // db.then(function(db) {
+    //     return db.collection("card_matches")
+    //         .find({ score: { $gt: 0 }, _participant_b_ids: request.params.query })
+    //         .stream({ transform: function(doc) { return JSON.stringify(doc); }});
+    // })
+    // .then(function(stream) {
+    //     stream.once("end", function() { response.write("]"); response.end() });
+    //     stream.on("data", function(d) { response.write(d); response.write(",") });
+    // })
+    // // response.end(request.params.query)
+});
+
 app.get("/matches/score-above-zero/participant-b/:query", function(request, response) {
     response.write("[")
     db.then(function(db) {
