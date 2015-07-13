@@ -4,7 +4,7 @@ main = d3.select("body").append("main")
     .append("row")
 
 # url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream.json"
-url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/200"
+url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/400"
 #url = "//bostock.evl.uic.edu:8080/matches/score-above-zero/participant-b/Uniprot:P05412"
 
 margin =
