@@ -11,7 +11,7 @@ width = height = cell_size * n
     
 addButtons = (container) ->
     base_url = "//bostock.evl.uic.edu:8080/matches/score-above-zero/participant-b/"
-    button_data = ["Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397", "Uniprot:P00533"]
+    button_data = ["Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397"]
     
     container.append("div").classed("row", true)
         .append("div").classed("col-xs-12", true)

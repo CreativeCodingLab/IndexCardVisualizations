@@ -18,7 +18,7 @@
   addButtons = function(container) {
     var base_url, button_data;
     base_url = "//bostock.evl.uic.edu:8080/matches/score-above-zero/participant-b/";
-    button_data = ["Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397", "Uniprot:P00533"];
+    button_data = ["Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397"];
     return container.append("div").classed("row", true).append("div").classed("col-xs-12", true).append("div").classed("panel panel-default", true).append("div").classed("panel-body", true).append("div").classed("btn-group", true).attr({
       "data-toggle": "buttons"
     }).call(function(div) {
