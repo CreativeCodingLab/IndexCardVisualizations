@@ -1,6 +1,5 @@
-# url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream.json"
-#url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/200"
 url = "//bostock.evl.uic.edu:8080/matches/score-above-zero/participant-b/Uniprot:P05412"
+#url = "//bostock.evl.uic.edu:8080/matches/score-above-zero-stream-limit/2"
 
 margin =
     top: 0
@@ -11,13 +10,11 @@ margin =
 cell_size = 10
 n = 1e3
 
-# [width, height] = [window.innerWidth, window.innerHeight]
 width = height = cell_size * n
 
 container = d3.select("body").append("main")
     .append("div").classed("container", true)
     .style({ "padding-top": "10px" })
-    
     
 addPanes = ->
     container.append("div").classed("row", true)
@@ -32,10 +29,26 @@ addPanes()
     
 main = container.append("div").classed("row", true)
 
-svg = main.append("svg")
+vis_row = container.append("div").classed("row", true)
+    
+matrix_panel = vis_row.append("div").classed("col-xs-6", true)
+    .append("div").classed("panel panel-default", true)
+    .append("div").classed("panel-body", true)
+    
+panels = [ { label: "FRIES Data", klass: "fries-data" }, { label: "PC Data", klass: "pc-data" } ]
+    
+vis_row.append("div").classed("col-xs-6", true)
+    .append("div").classed("row", true)
+    .selectAll(".panel").data(panels)
+    .enter().append("div").classed("panel panel-default", true)
+    .append("div").classed("panel-body", true)
+    .style({ height: "250px", overflow: "scroll" })
+    .append("h1").text((d) -> d.label)
+
+svg = matrix_panel.append("svg")
     .attr({
-        width: width + margin.left + margin.right,
-        height: height + margin.top + margin.bottom
+        width: "100%",
+        height: "500px"
     })
 
 svg.append("rect")
@@ -48,7 +61,7 @@ matrix_container = svg.append("g")
     .attr({ "transform": translate(margin.left, margin.top) })
 
 matrix_container.append("rect")
-    .attr({ width: width, height: height })
+    .attr({ width: "100%", height: "100%" })
     .style({ fill: "#eee" })
 
 rows_container = matrix_container.append("g").classed("rows", true)
@@ -106,9 +119,13 @@ doSearch = (url) ->
 x = d3.scale.ordinal()
 y = d3.scale.ordinal()
 
+cell_spacing = 0.15
+
 updateAll = ->
-    y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], 0.1)
-    x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], 0.1)
+    cell_size = parseInt(svg.style("width")) / pc.length
+    
+    y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], cell_spacing)
+    x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], cell_spacing)
 
     updateRows(fries)
     updateColumns(pc)
@@ -138,6 +155,9 @@ updateRows = (fries) ->
         .data((card) -> links.filter((link) -> link.source is card))
 
     cells.enter().append("g").classed("cell", true)
+        .on("mouseover", (d) -> 
+            console.log(d)
+        )
         .append("rect")
         .attr({ 
             width: x.rangeBand() - cell_padding, 
@@ -145,8 +165,6 @@ updateRows = (fries) ->
             x: cell_padding/2, 
             y: cell_padding/2 
         })
-        #.append("circle")
-        #.attr({ r: x.rangeBand() * 0.4, cx: x.rangeBand() / 2, cy: x.rangeBand() / 2 })
         .style({ opacity: 0.7 })
         .style({ 
             stroke: (d) -> color(d.match_data.deltaFeature),
