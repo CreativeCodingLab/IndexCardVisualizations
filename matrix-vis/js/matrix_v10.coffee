@@ -8,16 +8,18 @@ cell_size = 10
 n = 1e3
 
 width = height = cell_size * n
-    
+
 addButtons = (container) ->
     base_url = "//bostock.evl.uic.edu:8080/matches/score-above-zero/participant-b/"
-    button_data = ["Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397"]
-    
-    container.append("div").classed("row", true)
+    button_data = ["Uniprot:P25963", "Uniprot:P27361", "Uniprot:P05412", "Uniprot:Q05397"]
+
+    panel_body = container.append("div").classed("row", true)
         .append("div").classed("col-xs-12", true)
         .append("div").classed("panel panel-default", true)
         .append("div").classed("panel-body", true)
-        .call (div) ->
+
+    panel_body.call (div) ->
+            div.append("h4").text('Search for Participant B using an identifier (such as "Uniprot:P25963")')
             group = div.append("div").classed("input-group", true)
                 .style({ "margin-bottom": "20px" })
             group.append("span").classed("input-group-btn", true)
@@ -25,7 +27,7 @@ addButtons = (container) ->
                 .classed("btn btn-default", true)
                 .attr({ type: "button" })
                 .text("Search")
-                .on("click", -> 
+                .on("click", ->
                     value = text.node().value
                     if value.length
                         console.log(value)
@@ -34,17 +36,24 @@ addButtons = (container) ->
                 )
             text = group.append("input")
                 .attr({ type: "text", class: "form-control", placeholder: "Identifier" })
-                
+
             div.append("h4").text("Example Queries")
         .append("div").classed("btn-group search-buttons", true).attr({ "data-toggle": "buttons" })
         .call (div) ->
             label = div.selectAll("label").data(button_data)
-                
-            label.enter().append("label").classed("btn btn-primary", true)
+
+            label.enter().append("label").classed("btn btn-default", true)
                 .text((d) -> "Participant B: #{d}")
                 .on("click", (d) -> doSearch("#{base_url}#{d}"))
-                
+
             label.append("input").attr({ type: "radio", name: "data" })
+
+    panel_body.append("button").classed("btn btn-default", true)
+        .text("FRIES cards with potential conflicts and less than 100 matches.")
+        .on("click", ->
+            d3.select(".search-buttons").selectAll("label").classed("active", false)
+            doSearch("//bostock.evl.uic.edu:8080/all-with-conflict")
+        )
 
 translate = (x, y) -> "translate (#{x},#{y})"
 
@@ -53,15 +62,16 @@ pc = []
 links = []
 
 doSearch = (url) ->
+    console.log(url)
     fries = []
     pc = []
     links = []
     matrix_container.selectAll(".row").remove()
     matrix_container.selectAll(".column").remove()
-    
+
     if existing_oboe?
         existing_oboe.abort()
-        
+
     existing_oboe = oboe(url)
         .node("!.*", (card) ->
 
@@ -105,15 +115,15 @@ cell_padding = 0
 updateAll = ->
     matrix_width = (parseInt(svg.style("width")) - margin.left - margin.right)
     matrix_height = (parseInt(svg.style("height")) - margin.top - margin.bottom)
-    
+
     cell_size = matrix_width / pc.length
     cell_padding = if cell_size > 3 then 2 else 0
-    
+
     y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], cell_spacing)
     x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], cell_spacing)
 
     svg.style({ height: cell_size * fries.length + margin.top + margin.bottom })
-    
+
     pc_title = svg.selectAll(".columns-title").data(["pathway commons"])
     pc_title.enter().append("g").classed("columns-title", true)
         .append("text").text((d) -> d.toUpperCase())
@@ -121,7 +131,7 @@ updateAll = ->
     pc_title.attr({
         transform: translate(margin.left + matrix_width/2 - _wid/2, 10)
     })
-    
+
     fries_title = svg.selectAll(".rows-title").data(["fries"])
     fries_title.enter().append("g").classed("rows-title", true)
         .append("text").text((d) -> d.toUpperCase())
@@ -153,14 +163,14 @@ getOne = (json) ->
 mouseover = (d) ->
     d3.select(this).classed("highlight", true)
     getOne({ _id: d.source._id, collection: "fries_cards" })
-        .then (d) -> 
+        .then (d) ->
             json = JSON.parse(d.response)
             console.log(json)
             text = JSON.stringify(json, null, 2)
             d3.select(".fries-data .text").text(text)
             d3.select(".fries-data").selectAll("tr")
                 .each setHoverData(json)
-            
+
     getOne({ _id: d.target._id, collection: "pc_cards" })
         .then (d) ->
             json = JSON.parse(d.response)
@@ -169,10 +179,10 @@ mouseover = (d) ->
             d3.select(".pc-data .text").text(text)
             d3.select(".pc-data").selectAll("tr")
                 .each setHoverData(json)
-    
+
     d3.select(".match-data").selectAll("tr")
         .each setHoverData(d.match_data)
-                
+
 setHoverData = (data) ->
     (row) ->
         string = data[row.key]
@@ -186,7 +196,7 @@ setHoverData = (data) ->
             td.style({ color: (d) -> color(string) })
         if row.key is "potentialConflict"
             td.style({ color: (d) -> if string is true then "red" else "black" })
-            
+
 mouseout = (d) ->
     d3.select(this).classed("highlight", false)
     d3.select(".fries-data .text").text("")
@@ -206,7 +216,7 @@ updateRows = (fries) ->
     rows.attr({ transform: (d, i) -> translate(0, y(i)) })
         .select("text")
         .text((d) -> d._filename.slice(-6))
-    
+
     rows.exit().remove()
 
     cells = rows.selectAll(".cell")
@@ -225,31 +235,31 @@ updateRows = (fries) ->
             translate(x(index), 0)
         })
         .select("rect")
-        .attr({ 
-            width: x.rangeBand() - cell_padding, 
-            height: y.rangeBand() - cell_padding, 
-            x: cell_padding/2, 
-            y: cell_padding/2 
+        .attr({
+            width: x.rangeBand() - cell_padding,
+            height: y.rangeBand() - cell_padding,
+            x: cell_padding/2,
+            y: cell_padding/2
         })
         .style({ opacity: (d) -> score_scale(d.match_data.score) })
-        .style({ 
+        .style({
             fill: (d) -> if d.match_data.potentialConflict then "red" else color(d.match_data.deltaFeature)
         })
 
 updateColumns = (pc) ->
     columns_container.selectAll(".column").remove()
-    
+
     columns = columns_container.selectAll(".column").data(pc)
 
     columns.enter().append("g").classed("column", true)
         .append("text")
-        .attr({ dy: "8px" })
+        .attr({ dy: "#{cell_size * 0.4}px" })
         .style({ "font-size": font_size })
-        
+
     columns
         .attr({ transform: (d, i) -> translate(x(i),0) + "rotate(-90)" })
         .select("text").text (d) -> d._id.slice(-6)
-        
+
     columns.exit().remove()
 
 container = d3.select("body").append("main")
@@ -258,53 +268,53 @@ container = d3.select("body").append("main")
         .call(addButtons)
 
 vis_row = container.append("div").classed("row", true)
-    
+
 matrix_panel = vis_row.append("div").classed("col-xs-7", true)
     .append("div").classed("panel panel-default", true)
     .append("div").classed("panel-body", true)
-    
+
 arrayToString = (d) ->
     (td) ->
         html = if d.length then d.join("<br>") else d
         td.html(html)
-    
-panels = [ 
-        { 
-            label: "Match Data", 
-            klass: "match-data", 
+
+panels = [
+        {
+            label: "Match Data",
+            klass: "match-data",
             keys: [
                 { key: "deltaFeature", label: "Delta Feature" },
                 { key: "potentialConflict", label: "Potential Conflict?" },
                 { key: "participantA", label: "Participant A" },
                 { key: "score", label: "Score" }
             ]
-        }, 
-        { 
-            label: "FRIES Data", 
+        },
+        {
+            label: "FRIES Data",
             klass: "fries-data",
             keys: [
                 #{ key: "_filename", label: "File" },
-                { 
-                    key: "_participant_a_ids", 
+                {
+                    key: "_participant_a_ids",
                     label: "Participant A",
                     func: arrayToString
                 },
                 { key: "_participant_b_ids", label: "Participant B", func: arrayToString },
                 { key: "extracted_information", label: "Interaction Type", func: (d) -> (td) -> td.text(d.interaction_type) }
-                
+
             ]
-        }, 
-        { 
-            label: "PC Data", 
+        },
+        {
+            label: "PC Data",
             klass: "pc-data",
             keys: [
                 { key: "_participant_a_ids", label: "Participant A", func: arrayToString },
                 { key: "_participant_b_ids", label: "Participant B", func: arrayToString },
                  { key: "extracted_information", label: "Interaction Type", func: (d) -> (td) -> td.text(d.interaction_type) }
             ]
-        } 
+        }
     ]
-    
+
 vis_row.append("div").classed("col-xs-5", true)
     .selectAll(".panel")
     .data(panels)
@@ -314,22 +324,22 @@ vis_row.append("div").classed("col-xs-5", true)
     .call (div) ->
         div.append("div").classed("panel-heading", true)
             .text((d) -> d.label)
-            
+
         div.append("table").classed("table table-condensed", true)
             .append("tbody")
             .selectAll("tr").data((d) -> return d.keys or [])
             .enter().append("tr")
             .append("td").text((d) -> d.label)
-        
+
         div.append("div").classed("panel-body", true)
-        
+
         #div.append("pre").classed("text", true)
             #.style({ height: "250px", overflow: "scroll" })
     .each (d) ->
         if d.klass is "match-data"
             d3.select(this).select("pre").remove()
             d3.select(this).select(".panel-body").remove()
-    
+
 svg = matrix_panel.append("svg")
     .attr({
         width: "100%",
@@ -339,7 +349,7 @@ svg = matrix_panel.append("svg")
 #svg.append("rect")
     #.style({ fill: "none", stroke: "black" })
     #.attr({ width: "100%", height: "100%" })
-    
+
 matrix_container = svg.append("g")
     .attr({ "transform": translate(margin.left, margin.top) })
 
