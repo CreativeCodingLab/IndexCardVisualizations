@@ -172,9 +172,9 @@
 
   y = d3.scale.ordinal();
 
-  cell_spacing = 0.15;
+  cell_spacing = 0;
 
-  cell_padding = 2;
+  cell_padding = 0;
 
   updateAll = function() {
     cell_size = parseInt(svg.style("width")) / pc.length;
@@ -194,7 +194,7 @@
 
   color = d3.scale.category10();
 
-  score_scale = d3.scale.linear().domain([0, 10]).range([0, 1]);
+  score_scale = d3.scale.linear().domain([0, 10]).range([0, 0.7]);
 
   getOne = function(json) {
     return new Promise(function(resolve) {
@@ -264,13 +264,9 @@
         return score_scale(d.match_data.score);
       }
     }).style({
-      stroke: function(d) {
-        return color(d.match_data.deltaFeature);
-      },
-      "stroke-width": x.rangeBand() * 0.3,
       fill: function(d) {
         if (d.match_data.potentialConflict) {
-          return "none";
+          return "red";
         } else {
           return color(d.match_data.deltaFeature);
         }

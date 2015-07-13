@@ -138,8 +138,8 @@ doSearch = (url) ->
 x = d3.scale.ordinal()
 y = d3.scale.ordinal()
 
-cell_spacing = 0.15
-cell_padding = 2
+cell_spacing = 0
+cell_padding = 0
 
 updateAll = ->
     cell_size = parseInt(svg.style("width")) / pc.length
@@ -159,7 +159,7 @@ font_size = "9px"
 
 color = d3.scale.category10()
 
-score_scale = d3.scale.linear().domain([0,10]).range([0,1])
+score_scale = d3.scale.linear().domain([0,10]).range([0,0.7])
 
 getOne = (json) ->
     return new Promise (resolve) ->
@@ -217,9 +217,9 @@ updateRows = (fries) ->
         })
         .style({ opacity: (d) -> score_scale(d.match_data.score) })
         .style({ 
-            stroke: (d) -> color(d.match_data.deltaFeature),
-            "stroke-width": x.rangeBand() * 0.3,
-            fill: (d) -> if d.match_data.potentialConflict then "none" else color(d.match_data.deltaFeature)
+            #stroke: (d) -> color(d.match_data.deltaFeature),
+            #"stroke-width": x.rangeBand() * 0.3,
+            fill: (d) -> if d.match_data.potentialConflict then "red" else color(d.match_data.deltaFeature)
         })
 
 updateColumns = (pc) ->
