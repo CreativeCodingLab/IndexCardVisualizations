@@ -5,6 +5,7 @@ var MongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
 var assert = require("assert");
 var app = express();
+var fs = require('fs');
 
 var db_name = "index_cards_v2";
 var db_url = "mongodb://127.0.0.1:27017/" + db_name;
@@ -36,6 +37,51 @@ app.get("/all-with-conflict", function(request, response) {
     })
 })
 
+app.get("/all-with-superset", function(request, response) {
+    db.then(function(db) {
+        return db.collection("card_matches")
+            .find({
+                score: { $gt: 0 },
+                // "match.100": { $exists: true }
+            }).toArray()
+    })
+    .then(function(array) {
+        var a = array
+            .filter(function(m) { return m.match.some(function(d) { return (d.deltaFeature == "superset") && parseInt(d.score) > 0 }) })
+        response.json(a);
+    })
+})
+
+app.get("/all-with-delta-feature/:feature", function(request, response) {
+    db.then(function(db) {
+        return db.collection("card_matches")
+            .find({
+                score: { $gt: 0 },
+                // "match.100": { $exists: false }
+            }).toArray()
+    })
+    .then(function(array) {
+        var a = array
+            .filter(function(m) { return m.match.some(function(d) { return (d.deltaFeature == request.params.feature) && parseInt(d.score) > 0 }) })
+        response.json(a);
+    })
+})
+
+app.get("/all-with-delta-feature-limit/:feature", function(request, response) {
+    db.then(function(db) {
+        return db.collection("card_matches")
+            .find({
+                score: { $gt: 5 },
+                "match.100": { $exists: false }
+            }).toArray()
+    })
+    .then(function(array) {
+        var a = array
+            .filter(function(m) { return m.match.some(function(d) { return (d.deltaFeature == request.params.feature) && parseInt(d.score) > 0 }) })
+        response.json(a);
+    })
+})
+
 app.post("/get-one", function(request, response) {
 
     body = request.body;
@@ -51,6 +97,10 @@ app.post("/get-one", function(request, response) {
 });
 
 app.get("/matches/score-above-zero/participant-b/:query", function(request, response) {
+    // if (request.params.query == "Uniprot:P25963") {
+    //     fs.readFile(__dirname + "/static/Uniprot_P25963.json", function(err, data) { response.json(JSON.stringify(JSON.parse(data))) })
+    //     return
+    // }
     response.write("[")
     db.then(function(db) {
         return db.collection("card_matches")
