@@ -90,9 +90,8 @@ doSearch = (url) ->
 
             # Find or push new pc cards and new links
             card.match.forEach (match) ->
-                if match.score is 0
-                    return
-
+                return if match.score is 0
+                    
                 target_index = _.findIndex(pc, (d) -> d._id is match._id)
 
                 if target_index is -1
@@ -119,16 +118,100 @@ y = d3.scale.ordinal()
 cell_spacing = 0
 cell_padding = 0
 
+getLinks = (card, which_end) ->
+    links.filter (link) -> link[which_end] is card
+
+#setColumnVector = (other_set, this_side) ->
+    #(card) ->
+        #vector = d3.range(other_set.length)
+        #getLinks(card, this_side)
+            #.forEach (link) ->
+                #index = _.findIndex(other_set, (other) -> other._id is link.target._id)
+                #vector[index] = link.match_data.score
+        #card.vector = vector
+        #console.log(card.vector)
+        
+vectorDistance = (a, b) ->
+    sum_squares = d3.zip(a, b)
+        .map (arr) -> arr.reduce (a,b) -> a - b
+        .map (difference) -> Math.pow(difference, 2)
+        .reduce (a, b) -> a + b
+    Math.sqrt sum_squares
+        
+getDistance = (a, b) ->
+    return 0 if a is b
+    return vectorDistance(a.vector, b.vector)
+
 updateAll = ->
     matrix_width = (parseInt(svg.style("width")) - margin.left - margin.right)
     matrix_height = (parseInt(svg.style("height")) - margin.top - margin.bottom)
 
     cell_size = matrix_width / pc.length
     cell_padding = if cell_size > 3 then 2 else 0
+    
+    y_domain = fries.map (card) -> getLinks(card, "source")
+        .map (links) ->
+            vector = d3.range(pc.length).map -> 0
+            links.forEach (link) ->
+                index = _.findIndex(pc, (other) -> other._id is link.target._id)
+                vector[index] = link.match_data.score
+            vector
+        .map (vector, i) ->
+            { index: i, vector: vector }
+        .reduce (prev, current, i, array) ->
+            if prev.length is 0
+                prev = array
+            #prev.sort (a,b) ->
+                #a_length = a.vector.filter((d) -> d > 0).length
+                #b_length = b.vector.filter((d) -> d > 0).length
+                #d3.descending(a_length, b_length)
+            head = prev.slice(0, i+1)
+            last = head[head.length - 1]
+            tail = prev.slice(i+1)
+            tail.sort (a,b) ->
+                a_dist = vectorDistance(a.vector, last.vector)
+                b_dist = vectorDistance(b.vector, last.vector)
+                d3.ascending(a_dist, b_dist)
+            return head.concat(tail)
+        , []
+        .map (_) -> _.index
+    
+    x_domain = pc.map (card) -> getLinks(card, "target")
+        .map (links) ->
+            vector = d3.range(fries.length).map -> 0
+            links.forEach (link) ->
+                index = _.findIndex(fries, (other) -> other._id is link.source._id)
+                vector[index] = link.match_data.score
+            vector
+        .map (vector, i) ->
+            { index: i, vector: vector }
+        .reduce (prev, current, i, array) ->
+            if prev.length is 0
+                prev = array
+            #prev.sort (a,b) ->
+                #a_length = a.vector.filter((d) -> d > 0).length
+                #b_length = b.vector.filter((d) -> d > 0).length
+                #d3.descending(a_length, b_length)
+            head = prev.slice(0, i+1)
+            last = head[head.length - 1]
+            tail = prev.slice(i+1)
+            tail.sort (a,b) ->
+                a_dist = vectorDistance(a.vector, last.vector)
+                b_dist = vectorDistance(b.vector, last.vector)
+                d3.ascending(a_dist, b_dist)
+            return head.concat(tail)
+        , []
+        .map (_) -> _.index
+    
+    #y_domain = d3.range(fries.length)
+    #x_domain = d3.range(pc.length)
 
-    y.domain(d3.range(fries.length)).rangeBands([0, cell_size * fries.length], cell_spacing)
-    x.domain(d3.range(pc.length)).rangeBands([0, cell_size * pc.length], cell_spacing)
-
+    x.domain(x_domain)
+        .rangeBands([0, cell_size * pc.length], cell_spacing)
+        
+    y.domain(y_domain)
+        .rangeBands([0, cell_size * fries.length], cell_spacing)
+    
     svg.style({ height: cell_size * fries.length + margin.top + margin.bottom })
 
     pc_title = svg.selectAll(".columns-title").data(["pathway commons"])
@@ -278,7 +361,7 @@ updateColumns = (pc) ->
 
     columns.enter().append("g").classed("column", true)
         .append("text")
-        .attr({ dy: "#{cell_size * 0.4}px" })
+        .attr({ dy: "#{cell_size * 0.6}px" })
         .style({ "font-size": font_size })
 
     columns
