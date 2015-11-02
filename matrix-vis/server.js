@@ -8,12 +8,6 @@
 
   app.use(express["static"](__dirname));
 
-  // server = app.listen(process.env.PORT, function() {
-  //     console.log(server.address().address, server.address().port);
-  // });
-  
-  server = app.listen(8080, function() {
-      console.log(server.address().address, server.address().port);
-  });
+  app.listen(process.env.PORT, process.env.IP);
 
 }).call(this);
