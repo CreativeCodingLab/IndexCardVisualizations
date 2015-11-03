@@ -1,5 +1,7 @@
 {
     "uid": "index-card-vis",
-    "script": "server.js",
-    "append": true
+    "command": "coffee",
+    "script": "server.coffee",
+    "append": true,
+    "args": ["9001"]
 }

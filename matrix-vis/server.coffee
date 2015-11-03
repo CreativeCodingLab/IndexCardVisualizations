@@ -1,4 +1,6 @@
 express = require "express"
 app = express()
 app.use(express.static(__dirname))
-app.listen(process.env.PORT, process.env.IP)
+port = process.argv[2] || process.env.PORT
+server = app.listen port, "0.0.0.0", ->
+    console.log server.address()
