@@ -1,6 +1,6 @@
 var express = require("express");
-var bodyParser = require('body-parser')
-var mongodb = require('mongodb')
+var bodyParser = require('body-parser');
+var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 var ObjectID = mongodb.ObjectID;
 var assert = require("assert");
@@ -19,8 +19,6 @@ app.use(function(req, res, next) {
 });
 
 app.use(bodyParser.json({ strict: false }));
-
-var i = 0;
 
 app.get("/all-with-conflict", function(request, response) {
     db.then(function(db) {
@@ -84,7 +82,7 @@ app.get("/all-with-delta-feature-limit/:feature", function(request, response) {
 
 app.post("/get-one", function(request, response) {
 
-    body = request.body;
+    var body = request.body;
 
     db.then(function(db) {
         return db.collection(body.collection)
@@ -97,10 +95,14 @@ app.post("/get-one", function(request, response) {
 });
 
 app.get("/matches/score-above-zero/participant-b/:query", function(request, response) {
+    
+    // In case we want to read from a static example:
+    //
     // if (request.params.query == "Uniprot:P25963") {
     //     fs.readFile(__dirname + "/static/Uniprot_P25963.json", function(err, data) { response.json(JSON.stringify(JSON.parse(data))) })
     //     return
     // }
+    
     response.write("[")
     db.then(function(db) {
         return db.collection("card_matches")
@@ -158,7 +160,7 @@ app.get("/matches/all-matches-count.json", function(request, response) {
     })
 });
 
-var server = app.listen(8080, function () {
+var server = app.listen(9000, function () {
     var host = server.address().address;
     var port = server.address().port;
 
