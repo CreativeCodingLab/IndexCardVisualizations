@@ -144,7 +144,23 @@ var links;
   callT = function() {
     console.log("callT ************************** links="+links.length);
     for (var i=0; i<links.length;i++){
-      console.log(" "+i+"  link="+links[i]);
+      console.log(i+"  link="+links[i].target._id);
+      getOne({
+      _id: links[i].target._id,
+      collection: "pc_cards"
+      }).then(function(d) {
+        var json, text;
+        json = JSON.parse(d.response);
+       // console.log(i+" "+json.evidence);
+        var evidence = json.evidence;
+        for (var j=0; j<evidence.length;j++){
+          if (evidence[j].indexOf("Authored:") > -1)
+              console.log(i+" "+j +"  "+evidence[j]);
+        
+        }  
+    
+        
+      });
     
     }
   };
