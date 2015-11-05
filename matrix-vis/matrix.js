@@ -88,7 +88,6 @@ var links;
         var value;
         value = text.node().value;
         if (value.length) {
-          console.log(value);
           d3.select(".search-buttons").selectAll("label").classed("active", false);
           return doSearch("" + base_url + value);
         }
@@ -141,15 +140,21 @@ var links;
   links = [];
   
 
-
   callT = function() {
    // console.log("callT ************************** pc="+pc.length+ " nodes2.length="+nodes2.length
    //   + " links2.length="+links2.length);
     for (var i=0; i<pc.length;i++){
-     // console.log(pc[i]);
-      getOne({
-        _id: pc[i]._id,
-        collection: "pc_cards"
+      processCard(pc[i]._id,"pc_cards");  
+    }  
+    for (var i=0; i<fries.length;i++){
+      processCard(fries[i]._id,"fries_cards");  
+    }  
+  };
+
+  function processCard(id, cardType) {
+    getOne({
+        _id: id,
+        collection: cardType
         }).then(function(d) {
           var json, text;
           json = JSON.parse(d.response);
@@ -162,26 +167,26 @@ var links;
           if( Object.prototype.toString.call( partA ) === '[object Array]' ) {
             for (var j=0; j<partA.length;j++){
               if (j==0)  
-                nameA=partA[j].entity_text;
+                nameA=partA[j].identifier;
               else
-                nameA+="__"+partA[j].entity_text;
+                nameA+="__"+partA[j].identifier;
             }
           }
           else{
-            nameA = partA.entity_text;
+            nameA = partA.identifier;
           }  
 
           var nameB = "";
           if( Object.prototype.toString.call( partB ) === '[object Array]' ) {
             for (var j=0; j<partB.length;j++){
               if (j==0)  
-                nameB=partB[j].entity_text;
+                nameB=partB[j].identifier;
               else
-                nameB+="__"+partB[j].entity_text;
+                nameB+="__"+partB[j].identifier;
             }  
           }  
           else{
-            nameB = partB.entity_text;
+            nameB = partB.identifier;
           }  
 
 
@@ -214,31 +219,45 @@ var links;
             l.source = node1;
             l.target = node2;
             l.type = partType;
+            l.cardType = cardType;
             links2.push(l);
           }
-         // if (nodes2.length>1)
-         // console.log("name="+nodes2[1].name);
+
 
           force
                 .nodes(nodes2)
                 .links(links2)
                 .start();  
-
            //svg2.selectAll(".link").remove();    
-           var link = svg2.selectAll(".link")
+          /* var link = svg2.selectAll(".link")
                 .data(links2)
               .enter().append("line")
                 .attr("class", "link")
-                .style("stroke", "#000")
-                .style("stroke-width", 1);
+                .style("stroke", function(l) { return getLinkColor(l);})
+                .style("stroke-width", 1);*/
 
+
+            var linkArcs = svg2.selectAll(".linkArc")
+              .data(links2)
+              .enter().append("path")
+              .attr("class", "linkArc")
+              .attr("stroke-dasharray", function(d) {
+                if (d.cardType=="fries_cards")
+                  return "2 2";
+                else 
+                  return "0";
+              })   
+              .style("stroke", function(l) { return getLinkColor(l);})
+              .style("stroke-width",1) 
+              .style("fill-opacity",0);   
+                
            // svg2.selectAll(".node").remove();    
             var node = svg2.selectAll(".node")
                 .data(nodes2)
               .enter().append("circle")
                 .attr("class", "node")
                 .attr("r", 5)
-                .style("fill", "#f00")
+                .style("fill", "#bbb")
                 .call(force.drag);
 
             node.append("title")
@@ -249,7 +268,9 @@ var links;
               .data(nodes2)
              .enter().append("text")
               .attr("class", "label2")
-              .attr("dx", "8px")
+              .attr("dx", "5px")
+              .attr("font-family", "sans-serif")
+              .attr("font-size", "10px")  
               .style("text-anchor", "start")
               .text(function (d) { return d.name; })
               .call(force.drag);    
@@ -257,46 +278,152 @@ var links;
 
 
             force.on("tick", function() {
-              svg2.selectAll(".link").attr("x1", function(d) { return d.source.x; })
+              /*svg2.selectAll(".link").attr("x1", function(d) { return d.source.x; })
                   .attr("y1", function(d) { return d.source.y; })
                   .attr("x2", function(d) { return d.target.x; })
-                  .attr("y2", function(d) { return d.target.y; });
-
+                  .attr("y2", function(d) { return d.target.y; });*/
               svg2.selectAll(".node").attr("cx", function(d) { return d.x; })
                   .attr("cy", function(d) { return d.y; });
               
               svg2.selectAll(".label2").attr("x", function(d) { return d.x; })
                   .attr("y", function(d) { return d.y; });    
-            });
 
-          
+              svg2.selectAll(".linkArc").attr("d", linkArc);    
+            });    
         }
       );  
-    }  
+  }  
+  
+  function drawColorLegend() {
+      var xx = 102;
+      var y1 = 20;
+      var y2 = 34;
+      var y3 = 48;
+      var y4 = 62;
+      var rr = 6;
+      
 
-    
+
+      svg2.append("text")
+        .attr("class", "nodeLegend")
+        .attr("x", xx+15)
+        .attr("y", y1-12)
+        .text("fries_cards")
+        .attr("dy", ".21em")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .style("text-anchor", "start")
+        .style("fill", "#000");  
 
 
-      /*
-      for (var i=0; i<links.length;i++){
-       // console.log(i+"  id="+links[i].target._id);
-        getOne({
-        _id: links[i].target._id,
-        collection: "pc_cards"
-        }).then(function(d) {
-          var json, text;
-          json = JSON.parse(d.response);
-         // console.log(i+" "+d.response);
-          var evidence = json.evidence;
-          for (var j=0; j<evidence.length;j++){
-          //  if (evidence[j].indexOf("Authored:") > -1)
-          //      console.log(i+" j="+j +"  "+evidence[j]);
-          
-          }  
-        }
-        );
-      }*/
-  };
+      svg2.append("text")
+        .attr("class", "nodeLegend")
+        .attr("x", xx+90)
+        .attr("y", y1-12)
+        .text("pc_cards")
+        .attr("dy", ".21em")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .style("text-anchor", "start")
+        .style("fill", "#000");  
+
+        
+
+
+    svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+15)
+        .attr("y1", y1)
+        .attr("x2", xx+70)
+        .attr("y2", y1)
+        .attr("stroke-dasharray", "2 2")   
+        .style("stroke", "#00aa00");
+      
+      svg2.append("text")
+        .attr("class", "nodeLegend")
+        .attr("x", xx)
+        .attr("y", y1)
+        .text("adds_modification")
+        .attr("dy", ".21em")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .style("text-anchor", "end")
+        .style("fill", "#00aa00");
+   
+      svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+15)
+        .attr("y1", y2)
+        .attr("x2", xx+70)
+        .attr("y2", y2)
+        .attr("stroke-dasharray", "2 2")   
+        .style("stroke", "#cc0000");  
+
+      svg2.append("text")
+        .attr("class", "nodeLegend")
+        .attr("x", xx)
+        .attr("y", y2)
+        .text("remove_modification")
+        .attr("dy", ".21em")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .style("text-anchor", "end")
+        .style("fill", "#d00");  
+
+     svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+90)
+        .attr("y1", y1)
+        .attr("x2", xx+145)
+        .attr("y2", y1)
+        .style("stroke", "#00aa00");
+
+      svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+90)
+        .attr("y1", y2)
+        .attr("x2", xx+145)
+        .attr("y2", y2)
+        .style("stroke", "#d00");       
+  }
+
+
+  function linkArc(d) {
+      var f ;
+      
+
+      if (d.cardType=="pc_cards"){
+        if (d.type=="adds_modification")
+          f=10;
+        else if (d.type=="removes_modification")
+          f=2;
+        else
+          f =20;
+      }            
+      else {
+        if (d.type=="adds_modification")
+          f=1;
+        else if (d.type=="removes_modification")
+          f=0.5;
+        else
+          f =20;
+      }
+        
+
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy)*f;
+       return "M" + (d.target.x) + "," + d.target.y + "A" + dr + "," + dr + " 0 0,1 " + (d.source.x) + "," + d.source.y;
+    }
+
+  function getLinkColor(l) {
+  if (l.type=="adds_modification")
+    return "#0b0" ;
+  else if (l.type=="removes_modification")
+    return "#f00" ;
+  else
+    return "#000"; 
+  }
 
   doSearch = function(url) {
     // Tuan code's *******************
@@ -305,15 +432,19 @@ var links;
     node2NameList ={};
     force = d3.layout.force()
       .charge(-250)
-      .linkDistance(50)
+      .linkDistance(70)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    
       svg2.selectAll(".link").remove();         
-      svg2.selectAll(".label2").remove();               
+      svg2.selectAll(".label2").remove(); 
+      svg2.selectAll(".linkArc").remove();     
+      svg2.selectAll(".nodeLegend").remove();     
+      drawColorLegend();
+
     }  
     // Tuan code's END *******************
-    
+
 
 
     var existing_oboe;
@@ -361,7 +492,7 @@ var links;
             match_data: match_data
           });
         });
-          console.log(" "+pc.length);
+          console.log(" pc.length="+pc.length + " fries.length="+fries.length);
           callT.call();
         return updateAll();
       });  
@@ -827,7 +958,7 @@ var links;
 // Tuan's code ***********************************************
   svg2 = matrix_panel.append("svg").attr({
     width: "100%",
-    height: "500px"
+    height: "600px"
   });
  
 // Tuan's code END ***********************************************
