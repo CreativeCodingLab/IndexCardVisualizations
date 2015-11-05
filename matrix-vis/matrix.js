@@ -39,7 +39,7 @@ var links;
   score_scale, 
   setHoverData, 
   setText, 
-  svg, 
+  svg, svg2, force, nodes2, node2NameList, links2,
   translate, 
   updateAll, 
   updateColumns, 
@@ -118,14 +118,14 @@ var links;
       d3.select(".search-buttons").selectAll("label").classed("active", false);
       return doSearch(DATABASE_HOST + "/all-with-conflict");
     });
-   // return panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "supersetssssss" delta feature').on("click", function() {
-   //   d3.select(".search-buttons").selectAll("label").classed("active", false);
-   //   return doSearch(DATABASE_HOST + "/all-with-delta-feature/superset");
-   // });
-    return panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "exact" delta feature').on("click", function() {
+    return panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "superset" delta feature').on("click", function() {
       d3.select(".search-buttons").selectAll("label").classed("active", false);
-      return doSearch(DATABASE_HOST + "/all-with-delta-feature/exact");
+      return doSearch(DATABASE_HOST + "/all-with-delta-feature/superset");
     });
+    //return panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "exact" delta feature').on("click", function() {
+    //  d3.select(".search-buttons").selectAll("label").classed("active", false);
+    //  return doSearch(DATABASE_HOST + "/all-with-delta-feature/exact");
+    //});
   };
 
   
@@ -139,33 +139,183 @@ var links;
   pc = [];
 
   links = [];
+  
 
 
   callT = function() {
-    console.log("callT ************************** links="+links.length);
-    for (var i=0; i<links.length;i++){
-      console.log(i+"  link="+links[i].target._id);
+   // console.log("callT ************************** pc="+pc.length+ " nodes2.length="+nodes2.length
+   //   + " links2.length="+links2.length);
+    for (var i=0; i<pc.length;i++){
+     // console.log(pc[i]);
       getOne({
-      _id: links[i].target._id,
-      collection: "pc_cards"
-      }).then(function(d) {
-        var json, text;
-        json = JSON.parse(d.response);
-       // console.log(i+" "+json.evidence);
-        var evidence = json.evidence;
-        for (var j=0; j<evidence.length;j++){
-          if (evidence[j].indexOf("Authored:") > -1)
-              console.log(i+" "+j +"  "+evidence[j]);
-        
-        }  
+        _id: pc[i]._id,
+        collection: "pc_cards"
+        }).then(function(d) {
+          var json, text;
+          json = JSON.parse(d.response);
+          var evidence = json.evidence;
+         // console.log(i+" "+json.extracted_information);
+          var partA = json.extracted_information.participant_a;
+          var partB = json.extracted_information.participant_b;
+          var partType = json.extracted_information.interaction_type;
+          var nameA;
+          if( Object.prototype.toString.call( partA ) === '[object Array]' ) {
+            for (var j=0; j<partA.length;j++){
+              if (j==0)  
+                nameA=partA[j].entity_text;
+              else
+                nameA+="__"+partA[j].entity_text;
+            }
+          }
+          else{
+            nameA = partA.entity_text;
+          }  
+
+          var nameB = "";
+          if( Object.prototype.toString.call( partB ) === '[object Array]' ) {
+            for (var j=0; j<partB.length;j++){
+              if (j==0)  
+                nameB=partB[j].entity_text;
+              else
+                nameB+="__"+partB[j].entity_text;
+            }  
+          }  
+          else{
+            nameB = partB.entity_text;
+          }  
+
+
+          var node1;
+          if (nameA && nameA.length>0 && !node2NameList[nameA]){
+            node2NameList[nameA] = nodes2.length+1;  // To avoid value of 0;
+            node1 = {};
+            node1.name = nameA;
+            nodes2.push(node1);
+          }
+          else if (node2NameList[nameA]>=0){
+            var id = node2NameList[nameA]-1;
+            node1 = nodes2[id];
+          }
+
+          var node2;  
+          if (nameB && nameB.length>0 && !node2NameList[nameB]){
+            node2NameList[nameB] = nodes2.length+1;  // To avoid value of 0;
+            node2 = {};
+            node2.name = nameB;
+            nodes2.push(node2);
+          }
+          else if (node2NameList[nameB]>=0){
+            var id = node2NameList[nameB]-1;
+            node2 = nodes2[id];
+          }
+
+          if (node1 && node2){
+            var l = {};
+            l.source = node1;
+            l.target = node2;
+            l.type = partType;
+            links2.push(l);
+          }
+         // if (nodes2.length>1)
+         // console.log("name="+nodes2[1].name);
+
+          force
+                .nodes(nodes2)
+                .links(links2)
+                .start();  
+
+           //svg2.selectAll(".link").remove();    
+           var link = svg2.selectAll(".link")
+                .data(links2)
+              .enter().append("line")
+                .attr("class", "link")
+                .style("stroke", "#000")
+                .style("stroke-width", 1);
+
+           // svg2.selectAll(".node").remove();    
+            var node = svg2.selectAll(".node")
+                .data(nodes2)
+              .enter().append("circle")
+                .attr("class", "node")
+                .attr("r", 5)
+                .style("fill", "#f00")
+                .call(force.drag);
+
+            node.append("title")
+                .text(function(d) { return d.name; })
+                .style("fill", "#f00");
+
+            svg2.selectAll(".label2")
+              .data(nodes2)
+             .enter().append("text")
+              .attr("class", "label2")
+              .attr("dx", "8px")
+              .style("text-anchor", "start")
+              .text(function (d) { return d.name; })
+              .call(force.drag);    
+
+
+
+            force.on("tick", function() {
+              svg2.selectAll(".link").attr("x1", function(d) { return d.source.x; })
+                  .attr("y1", function(d) { return d.source.y; })
+                  .attr("x2", function(d) { return d.target.x; })
+                  .attr("y2", function(d) { return d.target.y; });
+
+              svg2.selectAll(".node").attr("cx", function(d) { return d.x; })
+                  .attr("cy", function(d) { return d.y; });
+              
+              svg2.selectAll(".label2").attr("x", function(d) { return d.x; })
+                  .attr("y", function(d) { return d.y; });    
+            });
+
+          
+        }
+      );  
+    }  
+
     
-        
-      });
-    
-    }
+
+
+      /*
+      for (var i=0; i<links.length;i++){
+       // console.log(i+"  id="+links[i].target._id);
+        getOne({
+        _id: links[i].target._id,
+        collection: "pc_cards"
+        }).then(function(d) {
+          var json, text;
+          json = JSON.parse(d.response);
+         // console.log(i+" "+d.response);
+          var evidence = json.evidence;
+          for (var j=0; j<evidence.length;j++){
+          //  if (evidence[j].indexOf("Authored:") > -1)
+          //      console.log(i+" j="+j +"  "+evidence[j]);
+          
+          }  
+        }
+        );
+      }*/
   };
 
   doSearch = function(url) {
+    // Tuan code's *******************
+    nodes2 = [];
+    links2 = [];  
+    node2NameList ={};
+    force = d3.layout.force()
+      .charge(-250)
+      .linkDistance(50)
+      .size([500, 700]);
+    if (svg2){
+      svg2.selectAll(".node").remove();    
+      svg2.selectAll(".link").remove();         
+      svg2.selectAll(".label2").remove();               
+    }  
+    // Tuan code's END *******************
+    
+
+
     var existing_oboe;
     fries = [];
     pc = [];
@@ -211,7 +361,7 @@ var links;
             match_data: match_data
           });
         });
-          console.log(" links="+links.length);
+          console.log(" "+pc.length);
           callT.call();
         return updateAll();
       });  
@@ -673,6 +823,15 @@ var links;
     width: "100%",
     height: "500px"
   });
+
+// Tuan's code ***********************************************
+  svg2 = matrix_panel.append("svg").attr({
+    width: "100%",
+    height: "500px"
+  });
+ 
+// Tuan's code END ***********************************************
+
 
   matrix_container = svg.append("g").attr({
     "transform": translate(margin.left, margin.top)
