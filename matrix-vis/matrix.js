@@ -3,7 +3,8 @@
 
 /* global d3, oboe, _ */
 var links;
-
+var svg, svg2, force, nodes2, node2IdList, link2List, links2;
+  
 (function() {
   var addButtons, 
   arrayToString, 
@@ -39,7 +40,6 @@ var links;
   score_scale, 
   setHoverData, 
   setText, 
-  svg, svg2, force, nodes2, node2NameList, links2,
   translate, 
   updateAll, 
   updateColumns, 
@@ -151,9 +151,9 @@ var links;
     }  
   };
 
-  function processCard(id, cardType) {
+  function processCard(cardId, cardType) {
     getOne({
-        _id: id,
+        _id: cardId,
         collection: cardType
         }).then(function(d) {
           var json, text;
@@ -163,64 +163,79 @@ var links;
           var partA = json.extracted_information.participant_a;
           var partB = json.extracted_information.participant_b;
           var partType = json.extracted_information.interaction_type;
-          var nameA;
-          if( Object.prototype.toString.call( partA ) === '[object Array]' ) {
-            for (var j=0; j<partA.length;j++){
+          var idA;
+          if( Object.prototype.toString.call(partA) === '[object Array]' ||
+            (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members)) {
+            var a = partA;
+            if (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members){
+              a = partA.family_members;
+            }  
+
+            for (var j=0; j<a.length;j++){
               if (j==0)  
-                nameA=partA[j].identifier;
+                idA=a[j].identifier;
               else
-                nameA+="__"+partA[j].identifier;
+                idA+="__"+a[j].identifier;
             }
           }
           else{
-            nameA = partA.identifier;
+            idA = partA.identifier;
           }  
 
-          var nameB = "";
-          if( Object.prototype.toString.call( partB ) === '[object Array]' ) {
-            for (var j=0; j<partB.length;j++){
+          var idB = "";
+          if( Object.prototype.toString.call( partB ) === '[object Array]' ||
+            (Object.prototype.toString.call(partB) === '[object Object]' && partB.family_members)) {
+            var b = partB;
+            if (Object.prototype.toString.call(partB) === '[object Object]' && partB.family_members){
+              b = partB.family_members;
+            }  
+
+            for (var j=0; j<b.length;j++){
               if (j==0)  
-                nameB=partB[j].identifier;
+                idB=b[j].identifier;
               else
-                nameB+="__"+partB[j].identifier;
+                idB+="__"+b[j].identifier;
             }  
           }  
           else{
-            nameB = partB.identifier;
+            idB = partB.identifier;
           }  
-
+          console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.identifier+" "+idA +"   "+idB);
+          
 
           var node1;
-          if (nameA && nameA.length>0 && !node2NameList[nameA]){
-            node2NameList[nameA] = nodes2.length+1;  // To avoid value of 0;
+          if (idA && idA.length>0 && !node2IdList[idA]){
+            node2IdList[idA] = nodes2.length+1;  // To avoid value of 0;
             node1 = {};
-            node1.name = nameA;
+            node1.id = idA;
             nodes2.push(node1);
           }
-          else if (node2NameList[nameA]>=0){
-            var id = node2NameList[nameA]-1;
+          else if (node2IdList[idA]>0){
+            var id = node2IdList[idA]-1;
             node1 = nodes2[id];
           }
 
           var node2;  
-          if (nameB && nameB.length>0 && !node2NameList[nameB]){
-            node2NameList[nameB] = nodes2.length+1;  // To avoid value of 0;
+          if (idB && idB.length>0 && !node2IdList[idB]){
+            node2IdList[idB] = nodes2.length+1;  // To avoid value of 0;
             node2 = {};
-            node2.name = nameB;
+            node2.id = idB;
             nodes2.push(node2);
           }
-          else if (node2NameList[nameB]>=0){
-            var id = node2NameList[nameB]-1;
+          else if (node2IdList[idB]>0){
+            var id = node2IdList[idB]-1;
             node2 = nodes2[id];
           }
-
-          if (node1 && node2){
+          if (node1 && node2 && !link2List[node1.id+"**"+node2.id]){
             var l = {};
             l.source = node1;
             l.target = node2;
             l.type = partType;
             l.cardType = cardType;
             links2.push(l);
+            if (!link2List[node1.id+"**"+node2.id])
+              link2List[node1.id+"**"+node2.id] = [];
+            link2List[node1.id+"**"+node2.id].push(cardId+"**"+cardType);
           }
 
 
@@ -249,6 +264,7 @@ var links;
               })   
               .style("stroke", function(l) { return getLinkColor(l);})
               .style("stroke-width",1) 
+              .style("stroke-opacity",0.5) 
               .style("fill-opacity",0);   
                 
            // svg2.selectAll(".node").remove();    
@@ -272,7 +288,7 @@ var links;
               .attr("font-family", "sans-serif")
               .attr("font-size", "10px")  
               .style("text-anchor", "start")
-              .text(function (d) { return d.name; })
+              .text(function (d) { return d.id; })
               .call(force.drag);    
 
 
@@ -384,7 +400,37 @@ var links;
         .attr("y1", y2)
         .attr("x2", xx+145)
         .attr("y2", y2)
-        .style("stroke", "#d00");       
+        .style("stroke", "#d00");      
+
+      // binds    
+      svg2.append("text")
+        .attr("class", "nodeLegend")
+        .attr("x", xx)
+        .attr("y", y3)
+        .text("binds")
+        .attr("dy", ".21em")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .style("text-anchor", "end")
+        .style("fill", "#00f");  
+
+
+     svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+15)
+        .attr("y1", y3)
+        .attr("x2", xx+70)
+        .attr("y2", y3)
+        .attr("stroke-dasharray", "2 2")   
+        .style("stroke", "#00f"); 
+
+      svg2.append("line")
+        .attr("class", "nodeLegend")
+        .attr("x1", xx+90)
+        .attr("y1", y3)
+        .attr("x2", xx+145)
+        .attr("y2", y3)
+        .style("stroke", "#00f");         
   }
 
 
@@ -421,6 +467,8 @@ var links;
     return "#0b0" ;
   else if (l.type=="removes_modification")
     return "#f00" ;
+  else if (l.type=="binds")
+    return "#00f" ;
   else
     return "#000"; 
   }
@@ -429,7 +477,8 @@ var links;
     // Tuan code's *******************
     nodes2 = [];
     links2 = [];  
-    node2NameList ={};
+    node2IdList ={};
+    link2List = {};
     force = d3.layout.force()
       .charge(-250)
       .linkDistance(70)
