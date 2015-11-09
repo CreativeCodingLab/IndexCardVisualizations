@@ -233,16 +233,16 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
             var id = node2IdList[idB]-1;
             node2 = nodes2[id];
           }
-          if (node1 && node2 && !link2List[node1.id+"**"+node2.id]){
+          if (node1 && node2 && !link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]){
             var l = {};
             l.source = node1;
             l.target = node2;
             l.type = partType;
             l.cardType = cardType;
             links2.push(l);
-            if (!link2List[node1.id+"**"+node2.id])
-              link2List[node1.id+"**"+node2.id] = [];
-            link2List[node1.id+"**"+node2.id].push(cardId+"**"+cardType);
+            if (!link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType])
+              link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = [];
+            link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType].push(cardId+"**"+cardType+"**"+partType+"**"+cardType);
           }
 
 
@@ -447,19 +447,19 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 
       if (d.cardType=="pc_cards"){
         if (d.type=="adds_modification")
-          f=3;
+          f=2.5;
         else if (d.type=="removes_modification")
-          f=2;
-        else if (d.type=="binds")
           f=1.5;
+        else if (d.type=="binds")
+          f=1.2;
         else
           f =20;
       }            
       else {
         if (d.type=="adds_modification")
-          f=1;
+          f=0.9;
         else if (d.type=="removes_modification")
-          f=0.75;
+          f=0.7;
         else if (d.type=="binds")
           f=0.5;
         else
