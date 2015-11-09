@@ -35,6 +35,19 @@ app.get("/all-with-conflict", function(request, response) {
     })
 })
 
+app.get("/getEvidencePC", function(request, response) {
+    db.then(function(db) {
+        return db.collection("pc_cards").find({ "evidence.1": { $exists: true } }).limit(500).toArray()
+    })
+     .then(function(array) {
+        // var a = array
+        //     .filter(function(m,i) { return  i< 100  })
+        response.json(array);
+    })
+})
+
+
+ 
 app.get("/all-with-superset", function(request, response) {
     db.then(function(db) {
         return db.collection("card_matches")

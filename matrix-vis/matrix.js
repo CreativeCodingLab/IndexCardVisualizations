@@ -117,7 +117,8 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
       d3.select(".search-buttons").selectAll("label").classed("active", false);
       return doSearch(DATABASE_HOST + "/all-with-conflict");
     });
-    return panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "superset" delta feature').on("click", function() {
+
+    panel_body.append("button").classed("btn btn-default", true).text('FRIES cards with "superset" delta feature').on("click", function() {
       d3.select(".search-buttons").selectAll("label").classed("active", false);
       return doSearch(DATABASE_HOST + "/all-with-delta-feature/superset");
     });
@@ -125,6 +126,12 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     //  d3.select(".search-buttons").selectAll("label").classed("active", false);
     //  return doSearch(DATABASE_HOST + "/all-with-delta-feature/exact");
     //});
+
+    panel_body.append("button").classed("btn btn-default", true).text('Authored data').on("click", function() {
+      d3.select(".search-buttons").selectAll("label").classed("active", false);
+      return doSearch2("http://localhost:9000/getEvidencePC");
+    });
+    
   };
 
   
@@ -200,7 +207,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
           else{
             idB = partB.identifier;
           }  
-          console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.identifier+" "+idA +"   "+idB);
+         // console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.identifier+" "+idA +"   "+idB);
           
 
           var node1;
@@ -440,9 +447,11 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 
       if (d.cardType=="pc_cards"){
         if (d.type=="adds_modification")
-          f=10;
+          f=3;
         else if (d.type=="removes_modification")
           f=2;
+        else if (d.type=="binds")
+          f=1.5;
         else
           f =20;
       }            
@@ -450,12 +459,13 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
         if (d.type=="adds_modification")
           f=1;
         else if (d.type=="removes_modification")
+          f=0.75;
+        else if (d.type=="binds")
           f=0.5;
         else
           f =20;
       }
-        
-
+    
         var dx = d.target.x - d.source.x,
             dy = d.target.y - d.source.y,
             dr = Math.sqrt(dx * dx + dy * dy)*f;
@@ -473,15 +483,16 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     return "#000"; 
   }
 
-  doSearch = function(url) {
-    // Tuan code's *******************
+
+  function init() {
+  // Tuan code's *******************
     nodes2 = [];
     links2 = [];  
     node2IdList ={};
     link2List = {};
     force = d3.layout.force()
-      .charge(-250)
-      .linkDistance(70)
+      .charge(-120)
+      .linkDistance(40)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    
@@ -493,8 +504,21 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 
     }  
     // Tuan code's END *******************
-
-
+  }  
+  doSearch2 = function(url) {
+    init();
+    
+    matrix_container.selectAll(".row").remove();
+    matrix_container.selectAll(".column").remove();
+    var existing_oboe = oboe(url).node("!.*", function(card) {
+      console.log("card:"+card.evidence);
+      processCard(card._id,"pc_cards");  
+    //  debugger;
+    });    
+  }  
+  
+  doSearch = function(url) {
+    init();
 
     var existing_oboe;
     fries = [];
@@ -1041,9 +1065,11 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
   existing_oboe = null;
 
   container.selectAll("label").each(function(d, i) {
+    //
+    doSearch2("http://localhost:9000/getEvidencePC");
+    /*
     if (i === 0) {
       d3.select(this).node().click();
-
     }
     if (d === "Uniprot:P27361") {
       d3.select(this).select("a").append("span").text(" (includes potentialConflict)");
@@ -1051,21 +1077,8 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     if (d === "Uniprot:P00533") {
       return d3.select(this).select("a").append("span").text(" (demonstrates scaling issues)");
     }
+    */
 
-
- //    debugger;
-/*getOne({
-      _id: d.target._id,
-      collection: "pc_cards"
-    }).then(function(d) {
-      var json, text;
-      json = JSON.parse(d.response);
-      console.log(json);
-      text = JSON.stringify(json, null, 2);
-      d3.select(".pc-data .text").text(text);
-      return d3.select(".pc-data").selectAll("tr")
-        .each(setHoverData(json));
-    });*/
   });
 
 }).call(this);
