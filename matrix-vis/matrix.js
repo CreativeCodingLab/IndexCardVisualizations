@@ -1066,8 +1066,8 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 
   container.selectAll("label").each(function(d, i) {
     //
-    doSearch2("http://localhost:9000/getEvidencePC");
-    /*
+   // doSearch2("http://localhost:9000/getEvidencePC");
+    
     if (i === 0) {
       d3.select(this).node().click();
     }
@@ -1077,8 +1077,6 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     if (d === "Uniprot:P00533") {
       return d3.select(this).select("a").append("span").text(" (demonstrates scaling issues)");
     }
-    */
-
   });
 
 }).call(this);
