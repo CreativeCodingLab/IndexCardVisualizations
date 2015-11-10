@@ -453,7 +453,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
         else if (d.type=="binds")
           f=1.2;
         else
-          f =20;
+          f =10;
       }            
       else {
         if (d.type=="adds_modification")
@@ -463,7 +463,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
         else if (d.type=="binds")
           f=0.5;
         else
-          f =20;
+          f =10;
       }
     
         var dx = d.target.x - d.source.x,
