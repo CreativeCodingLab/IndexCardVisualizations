@@ -209,7 +209,7 @@ function saveTimeArcsData() {
           var partA = json.extracted_information.participant_a;
           var partB = json.extracted_information.participant_b;
           var partType = json.extracted_information.interaction_type;
-          var idA;
+          var idA="";
           if( Object.prototype.toString.call(partA) === '[object Array]' ||
             (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members)) {
             var a = partA;
@@ -218,23 +218,25 @@ function saveTimeArcsData() {
             }  
 
             for (var j=0; j<a.length;j++){
-              if (a[j].identifier){
-                if (j==0)  
-                  idA=a[j].identifier;
-                else
-                  idA+="__"+a[j].identifier;
+              if (a[j].entity_text){
+               // if (a.length>1)
+               //   debugger;
+                if (idA.length==0)  
+                  idA=a[j].entity_text.replace("_HUMAN", "");
+                else 
+                  idA+="__"+a[j].entity_text.replace("_HUMAN", "");
               }
-              else{
-                //console.log("a[j].identifier="+a[j].identifier);
-                //return;
-              }
-                
             }
-            if (idA && idA.indexOf("undefined")>-1)
+            /*if (idA && idA.indexOf("undefined")>-1){
               console.log("idA="+idA);
+              for (var j=0; j<a.length;j++){
+                console.log("a[j].entity_text="+a[j].entity_text);
+              }
+            }*/
+              
           }
           else{
-            idA = partA.identifier;
+            idA = partA.entity_text.replace("_HUMAN", "");
           }  
 
           var idB = "";
@@ -244,61 +246,60 @@ function saveTimeArcsData() {
             if (Object.prototype.toString.call(partB) === '[object Object]' && partB.family_members){
               b = partB.family_members;
             }  
-
             for (var j=0; j<b.length;j++){
-              if (b[j].identifier){
-                if (j==0)  
-                  idB=b[j].identifier;
+              if (b[j].entity_text){
+                if (idB.length==0)  
+                  idB=b[j].entity_text.replace("_HUMAN", "");
                 else
-                  idB+="__"+b[j].identifier;
+                  idB+="__"+b[j].entity_text.replace("_HUMAN", "");
               }
-              // else
-              //  return;
             }  
           }  
           else{
-            idB = partB.identifier;
+            idB = partB.entity_text.replace("_HUMAN", "");
           }  
-         // console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.identifier+" "+idA +"   "+idB);
+         // console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.entity_text+" "+idA +"   "+idB);
           
+          //idA.replace("HUMAN", "");
+          //idB.replace("HUMAN", "");
+          if (idA && idA.length>0 && idB && idB.length>0){
+            var node1;
+            if (!node2IdList[idA]){
+              node2IdList[idA] = nodes2.length+1;  // To avoid value of 0;
+              node1 = {};
+              node1.id = idA;
+              nodes2.push(node1);
+            }
+            else if (node2IdList[idA]>0){
+              var id = node2IdList[idA]-1;
+              node1 = nodes2[id];
+            }
 
-          var node1;
-          if (idA && idA.length>0 && !node2IdList[idA]){
-            node2IdList[idA] = nodes2.length+1;  // To avoid value of 0;
-            node1 = {};
-            node1.id = idA;
-            nodes2.push(node1);
-          }
-          else if (node2IdList[idA]>0){
-            var id = node2IdList[idA]-1;
-            node1 = nodes2[id];
-          }
-
-          var node2;  
-          if (idB && idB.length>0 && !node2IdList[idB]){
-            node2IdList[idB] = nodes2.length+1;  // To avoid value of 0;
-            node2 = {};
-            node2.id = idB;
-            nodes2.push(node2);
-          }
-          else if (node2IdList[idB]>0){
-            var id = node2IdList[idB]-1;
-            node2 = nodes2[id];
-          }
-          if (node1 && node2 && !link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]){
-            var l = {};
-            l.source = node1;
-            l.target = node2;
-            l.type = partType;
-            l.cardType = cardType;
-            l.year = year;
-            l.evidenceText = evidenceText;
-            links2.push(l);
-            if (!link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType])
-              link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = [];
-            link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType].push(cardId+"**"+cardType+"**"+partType+"**"+cardType);
-          }
-
+            var node2;  
+            if (!node2IdList[idB]){
+              node2IdList[idB] = nodes2.length+1;  // To avoid value of 0;
+              node2 = {};
+              node2.id = idB;
+              nodes2.push(node2);
+            }
+            else if (node2IdList[idB]>0){
+              var id = node2IdList[idB]-1;
+              node2 = nodes2[id];
+            }
+            if (node1 && node2 && !link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]){
+              var l = {};
+              l.source = node1;
+              l.target = node2;
+              l.type = partType;
+              l.cardType = cardType;
+              l.year = year;
+              l.evidenceText = evidenceText;
+              links2.push(l);
+              if (!link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType])
+                link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = [];
+              link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType].push(cardId+"**"+cardType+"**"+partType+"**"+cardType);
+            }
+          }    
 
           force
                 .nodes(nodes2)
