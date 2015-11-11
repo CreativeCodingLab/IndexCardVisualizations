@@ -5,6 +5,25 @@
 var links;
 var svg, svg2, force, nodes2, node2IdList, link2List, links2;
   
+  
+// This function is called when a button clicked when we want to save the data
+
+function saveTimeArcsData() {
+  console.log("*********** saveTimeArcsData ******************");
+  var csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Year\tRating\tConference\tTitle\tAuthor Names\n"
+  links2.forEach(function(l, index){
+     // debugger;
+     dataString = l.year+"\t"+"8"+"\t"+l.type+"\t"+l.evidenceText+"\t"+l.source.id +";"+l.target.id;
+     csvContent += index < links2.length ? dataString+ "\n" : dataString;
+  });
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "pc.tsv");
+  link.click(); // This will download the data file named "my_data.csv".
+}
+
 (function() {
   var addButtons, 
   arrayToString, 
@@ -52,7 +71,9 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
   
   // This is very important
   // It tells us where to find the database
-  var DATABASE_HOST = "//creativecoding.evl.uic.edu:9000"
+  //var DATABASE_HOST = "//creativecoding.evl.uic.edu:9000"
+  var DATABASE_HOST = "http://localhost:9000"
+  
 
   margin = {
     top: 50,
@@ -129,7 +150,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 
     panel_body.append("button").classed("btn btn-default", true).text('Authored data').on("click", function() {
       d3.select(".search-buttons").selectAll("label").classed("active", false);
-      return doSearch2("http://localhost:9000/getEvidencePC");
+      return doSearch2(DATABASE_HOST+"/getEvidencePC");
     });
     
   };
@@ -166,7 +187,25 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
           var json, text;
           json = JSON.parse(d.response);
           var evidence = json.evidence;
-         // console.log(i+" "+json.extracted_information);
+         
+
+          var authored = "";
+          var year = "";
+          var evidenceText = "";
+          for (var k=0; k<evidence.length;k++){
+            if (evidence[k].indexOf("Authored:")>-1){
+              var list = evidence[k].split(", ");
+              year = list[list.length-1].substring(0, 4);
+              //console.log(k+" "+list);
+            // console.log(k+" year="+year);
+              
+            }
+            if (evidence[k].indexOf("Authored:")<0 && evidence[k].indexOf("Edited:")<0
+              && evidence[k].indexOf("Reviewed:")<0){
+              evidenceText = evidence[k];
+            }       
+          }
+
           var partA = json.extracted_information.participant_a;
           var partB = json.extracted_information.participant_b;
           var partType = json.extracted_information.interaction_type;
@@ -179,11 +218,20 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
             }  
 
             for (var j=0; j<a.length;j++){
-              if (j==0)  
-                idA=a[j].identifier;
-              else
-                idA+="__"+a[j].identifier;
+              if (a[j].identifier){
+                if (j==0)  
+                  idA=a[j].identifier;
+                else
+                  idA+="__"+a[j].identifier;
+              }
+              else{
+                //console.log("a[j].identifier="+a[j].identifier);
+                //return;
+              }
+                
             }
+            if (idA && idA.indexOf("undefined")>-1)
+              console.log("idA="+idA);
           }
           else{
             idA = partA.identifier;
@@ -198,10 +246,14 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
             }  
 
             for (var j=0; j<b.length;j++){
-              if (j==0)  
-                idB=b[j].identifier;
-              else
-                idB+="__"+b[j].identifier;
+              if (b[j].identifier){
+                if (j==0)  
+                  idB=b[j].identifier;
+                else
+                  idB+="__"+b[j].identifier;
+              }
+              // else
+              //  return;
             }  
           }  
           else{
@@ -239,6 +291,8 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
             l.target = node2;
             l.type = partType;
             l.cardType = cardType;
+            l.year = year;
+            l.evidenceText = evidenceText;
             links2.push(l);
             if (!link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType])
               link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = [];
@@ -287,6 +341,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
                 .text(function(d) { return d.name; })
                 .style("fill", "#f00");
 
+            
             svg2.selectAll(".label2")
               .data(nodes2)
              .enter().append("text")
@@ -324,8 +379,6 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
       var y3 = 48;
       var y4 = 62;
       var rr = 6;
-      
-
 
       svg2.append("text")
         .attr("class", "nodeLegend")
@@ -491,8 +544,8 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     node2IdList ={};
     link2List = {};
     force = d3.layout.force()
-      .charge(-120)
-      .linkDistance(40)
+      .charge(-40)
+      .linkDistance(20)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    
@@ -511,7 +564,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     matrix_container.selectAll(".row").remove();
     matrix_container.selectAll(".column").remove();
     var existing_oboe = oboe(url).node("!.*", function(card) {
-      console.log("card:"+card.evidence);
+    //  console.log("card:"+card.evidence);
       processCard(card._id,"pc_cards");  
     //  debugger;
     });    
@@ -1065,9 +1118,10 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
   existing_oboe = null;
 
   container.selectAll("label").each(function(d, i) {
-    //
-   // doSearch2("http://localhost:9000/getEvidencePC");
-    
+
+   doSearch2("http://localhost:9000/getEvidencePC");
+
+   /* 
     if (i === 0) {
       d3.select(this).node().click();
     }
@@ -1076,7 +1130,7 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
     }
     if (d === "Uniprot:P00533") {
       return d3.select(this).select("a").append("span").text(" (demonstrates scaling issues)");
-    }
+    }*/
   });
 
 }).call(this);

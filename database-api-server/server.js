@@ -37,7 +37,7 @@ app.get("/all-with-conflict", function(request, response) {
 
 app.get("/getEvidencePC", function(request, response) {
     db.then(function(db) {
-        return db.collection("pc_cards").find({ "evidence.1": { $exists: true } }).limit(500).toArray()
+        return db.collection("pc_cards").find({ "evidence.1": { $exists: true } }).limit(5000).toArray()
     })
      .then(function(array) {
         // var a = array
