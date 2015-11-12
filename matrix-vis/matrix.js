@@ -12,6 +12,8 @@ function saveTimeArcsData() {
   console.log("*********** saveTimeArcsData ******************");
   var csvContent = "data:text/csv;charset=utf-8,";
   csvContent += "Year\tRating\tConference\tTitle\tAuthor Names\n"
+  console.log("links2.length="+links2.length);
+
   links2.forEach(function(l, index){
      // debugger;
      dataString = l.year+"\t"+"8"+"\t"+l.type+"\t"+l.evidenceText+"\t"+l.source.id +";"+l.target.id;
@@ -172,23 +174,35 @@ function saveTimeArcsData() {
    // console.log("callT ************************** pc="+pc.length+ " nodes2.length="+nodes2.length
    //   + " links2.length="+links2.length);
     for (var i=0; i<pc.length;i++){
-      processCard(pc[i]._id,"pc_cards");  
-    }  
-    for (var i=0; i<fries.length;i++){
-      processCard(fries[i]._id,"fries_cards");  
-    }  
-  };
-
-  function processCard(cardId, cardType) {
-    getOne({
-        _id: cardId,
-        collection: cardType
+      getOne({
+        _id: pc[i]._id,
+        collection: "pc_cards"
         }).then(function(d) {
           var json, text;
           json = JSON.parse(d.response);
           var evidence = json.evidence;
-         
+          processCard(json, "pc_cards"); 
+        });
+    }  
+    for (var i=0; i<fries.length;i++){
+      getOne({
+        _id: fries[i]._id,
+        collection: "fries_cards"
+        }).then(function(d) {
+          var json, text;
+          json = JSON.parse(d.response);
+          var evidence = json.evidence;
+        processCard(json,"fries_cards");  
+      });  
+    }    
+  };
 
+  function processCard(card, cardType) {
+          var cardId = card._id;
+          var evidence = card.evidence;
+          
+         // console.log(cardType+" "+cardId+" "+evidence);
+          
           var authored = "";
           var year = "";
           var evidenceText = "";
@@ -206,9 +220,9 @@ function saveTimeArcsData() {
             }       
           }
 
-          var partA = json.extracted_information.participant_a;
-          var partB = json.extracted_information.participant_b;
-          var partType = json.extracted_information.interaction_type;
+          var partA = card.extracted_information.participant_a;
+          var partB = card.extracted_information.participant_b;
+          var partType = card.extracted_information.interaction_type;
           var idA="";
           if( Object.prototype.toString.call(partA) === '[object Array]' ||
             (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members)) {
@@ -258,32 +272,32 @@ function saveTimeArcsData() {
           else{
             idB = partB.entity_text.replace("_HUMAN", "");
           }  
-         // console.log(cardType+" "+cardId+" "+Object.prototype.toString.call(partA)+" "+partA.entity_text+" "+idA +"   "+idB);
           
+
           //idA.replace("HUMAN", "");
           //idB.replace("HUMAN", "");
           if (idA && idA.length>0 && idB && idB.length>0){
             var node1;
             if (!node2IdList[idA]){
-              node2IdList[idA] = nodes2.length+1;  // To avoid value of 0;
+              node2IdList[idA] = nodes2.length; 
               node1 = {};
               node1.id = idA;
               nodes2.push(node1);
             }
-            else if (node2IdList[idA]>0){
-              var id = node2IdList[idA]-1;
+            else if (node2IdList[idA]>=0){
+              var id = node2IdList[idA];
               node1 = nodes2[id];
             }
 
             var node2;  
             if (!node2IdList[idB]){
-              node2IdList[idB] = nodes2.length+1;  // To avoid value of 0;
+              node2IdList[idB] = nodes2.length;  
               node2 = {};
               node2.id = idB;
               nodes2.push(node2);
             }
-            else if (node2IdList[idB]>0){
-              var id = node2IdList[idB]-1;
+            else if (node2IdList[idB]>=0){
+              var id = node2IdList[idB];
               node2 = nodes2[id];
             }
             if (node1 && node2 && !link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]){
@@ -296,11 +310,16 @@ function saveTimeArcsData() {
               l.evidenceText = evidenceText;
               links2.push(l);
               if (!link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType])
-                link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = [];
-              link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType].push(cardId+"**"+cardType+"**"+partType+"**"+cardType);
+                link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = 1;
+              else
+                link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]++;
+              if (link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]>1){
+                console.log("node1="+node1.id+" node2"+node2.id+ link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]);
+              }
             }
           }    
 
+          console.log("nodes2="+nodes2.length+" links2="+links2.length);
           force
                 .nodes(nodes2)
                 .links(links2)
@@ -369,8 +388,7 @@ function saveTimeArcsData() {
 
               svg2.selectAll(".linkArc").attr("d", linkArc);    
             });    
-        }
-      );  
+      
   }  
   
   function drawColorLegend() {
@@ -468,7 +486,7 @@ function saveTimeArcsData() {
         .attr("class", "nodeLegend")
         .attr("x", xx)
         .attr("y", y3)
-        .text("binds")
+        .text("translocation")
         .attr("dy", ".21em")
         .attr("font-family", "sans-serif")
         .attr("font-size", "11px")
@@ -531,8 +549,10 @@ function saveTimeArcsData() {
     return "#0b0" ;
   else if (l.type=="removes_modification")
     return "#f00" ;
-  else if (l.type=="binds")
+  else if (l.type=="translocation")
     return "#00f" ;
+  else if (l.type=="binds")
+    return "#d90" ;  
   else
     return "#000"; 
   }
@@ -565,9 +585,8 @@ function saveTimeArcsData() {
     matrix_container.selectAll(".row").remove();
     matrix_container.selectAll(".column").remove();
     var existing_oboe = oboe(url).node("!.*", function(card) {
-    //  console.log("card:"+card.evidence);
-      processCard(card._id,"pc_cards");  
-    //  debugger;
+      //console.log("card:"+card.evidence);
+      processCard(card,"pc_cards");  
     });    
   }  
   
@@ -1122,7 +1141,7 @@ function saveTimeArcsData() {
 
    doSearch2("http://localhost:9000/getEvidencePC");
 
-   /* 
+/*
     if (i === 0) {
       d3.select(this).node().click();
     }

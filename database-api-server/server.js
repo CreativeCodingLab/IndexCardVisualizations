@@ -37,14 +37,20 @@ app.get("/all-with-conflict", function(request, response) {
 
 app.get("/getEvidencePC", function(request, response) {
     db.then(function(db) {
-        return db.collection("pc_cards").find({ "evidence.1": { $exists: true } }).limit(10000).toArray()
+       // var a = db.collection("pc_cards").find({ "evidence.1": { $exists: true } }).limit(2).toArray()
+       // .filter(function(d){ return d.evidence.some(function(e) {return e.indexOf("Authored:")>-1;}) });
+
+        //{$regex : ".*Authored:.*"}
+        return db.collection("pc_cards").find({ "evidence": {$regex : ".*Authored: .*20..-.*"} }).limit(8000).toArray();
     })
      .then(function(array) {
+        console.log("array="+array.length);
         // var a = array
         //     .filter(function(m,i) { return  i< 100  })
         response.json(array);
     })
 })
+// 2003 first has some data
 
 
  
