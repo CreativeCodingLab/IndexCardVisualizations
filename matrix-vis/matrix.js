@@ -565,8 +565,8 @@ function saveTimeArcsData() {
     node2IdList ={};
     link2List = {};
     force = d3.layout.force()
-      .charge(-40)
-      .linkDistance(20)
+      .charge(-50)
+      .linkDistance(30)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    
@@ -1139,9 +1139,9 @@ function saveTimeArcsData() {
 
   container.selectAll("label").each(function(d, i) {
 
-   doSearch2("http://localhost:9000/getEvidencePC");
+  // doSearch2("http://localhost:9000/getEvidencePC");
 
-/*
+
     if (i === 0) {
       d3.select(this).node().click();
     }
@@ -1150,7 +1150,7 @@ function saveTimeArcsData() {
     }
     if (d === "Uniprot:P00533") {
       return d3.select(this).select("a").append("span").text(" (demonstrates scaling issues)");
-    }*/
+    }
   });
 
 }).call(this);
