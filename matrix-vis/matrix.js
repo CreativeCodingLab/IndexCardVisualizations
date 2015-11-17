@@ -558,8 +558,8 @@ function saveTimeArcsData() {
     node2IdList ={};
     link2List = {};
     force = d3.layout.force()
-      .charge(-40)
-      .linkDistance(22)
+      .charge(-30)
+      .linkDistance(15)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    
