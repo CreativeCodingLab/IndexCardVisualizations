@@ -11,12 +11,12 @@ var svg, svg2, force, nodes2, node2IdList, link2List, links2;
 function saveTimeArcsData() {
   console.log("*********** saveTimeArcsData ******************");
   var csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Year\tRating\tConference\tTitle\tAuthor Names\n"
+  csvContent += "CardId\tYear\tConference\tTitle\tAuthor Names\n"
   console.log("links2.length="+links2.length);
 
   links2.forEach(function(l, index){
      // debugger;
-     dataString = l.year+"\t"+"8"+"\t"+l.type+"\t"+l.evidenceText+"\t"+l.source.id +";"+l.target.id;
+     dataString = l.cardId+"\t"+l.year+"\t"+l.type+"\t"+l.evidenceText+"\t"+l.source.id +";"+l.target.id;
      csvContent += index < links2.length ? dataString+ "\n" : dataString;
   });
   var encodedUri = encodeURI(csvContent);
@@ -223,8 +223,8 @@ function saveTimeArcsData() {
           var partA = card.extracted_information.participant_a;
           var partB = card.extracted_information.participant_b;
           var partType = card.extracted_information.interaction_type;
-          var idA="";
-          if( Object.prototype.toString.call(partA) === '[object Array]' ||
+          var idA=partA.entity_text; //"";
+          /*if( Object.prototype.toString.call(partA) === '[object Array]' ||
             (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members)) {
             var a = partA;
             if (Object.prototype.toString.call(partA) === '[object Object]' && partA.family_members){
@@ -232,79 +232,74 @@ function saveTimeArcsData() {
             }  
 
             for (var j=0; j<a.length;j++){
-              if (a[j].entity_text){
-               // if (a.length>1)
-               //   debugger;
+              if (a[j].identifier){//entity_text){
                 if (idA.length==0)  
-                  idA=a[j].entity_text.replace("_HUMAN", "");
+                  idA=a[j].identifier;//.entity_text.replace("_HUMAN", "");
                 else 
-                  idA+="__"+a[j].entity_text.replace("_HUMAN", "");
+                  idA+="__"+a[j].identifier;//.entity_text.replace("_HUMAN", "");
               }
             }
-            /*if (idA && idA.indexOf("undefined")>-1){
-              console.log("idA="+idA);
-              for (var j=0; j<a.length;j++){
-                console.log("a[j].entity_text="+a[j].entity_text);
-              }
-            }*/
-              
           }
           else{
-            idA = partA.entity_text.replace("_HUMAN", "");
-          }  
+            idA = partA.identifier;//.entity_text.replace("_HUMAN", "");
+          }  */
 
-          var idB = "";
-          if( Object.prototype.toString.call( partB ) === '[object Array]' ||
+          var idB = partB.entity_text;//"";
+          /*if( Object.prototype.toString.call( partB ) === '[object Array]' ||
             (Object.prototype.toString.call(partB) === '[object Object]' && partB.family_members)) {
             var b = partB;
             if (Object.prototype.toString.call(partB) === '[object Object]' && partB.family_members){
               b = partB.family_members;
             }  
             for (var j=0; j<b.length;j++){
-              if (b[j].entity_text){
+              if (b[j].identifier){//.entity_text){
                 if (idB.length==0)  
-                  idB=b[j].entity_text.replace("_HUMAN", "");
+                  idB=b[j].identifier;//.entity_text.replace("_HUMAN", "");
                 else
-                  idB+="__"+b[j].entity_text.replace("_HUMAN", "");
+                  idB+="__"+b[j].identifier;//.entity_text.replace("_HUMAN", "");
               }
             }  
           }  
           else{
-            idB = partB.entity_text.replace("_HUMAN", "");
-          }  
+            idB = partB.identifier;//.entity_text.replace("_HUMAN", "");
+          }  */
           
 
           //idA.replace("HUMAN", "");
           //idB.replace("HUMAN", "");
           if (idA && idA.length>0 && idB && idB.length>0){
+            idA = idA.replace("_HUMAN", "");
+            idB = idB.replace("_HUMAN", "");
             var node1;
-            if (!node2IdList[idA]){
+            if (node2IdList[idA]>=0){
+              var id = node2IdList[idA];
+              node1 = nodes2[id];
+            }
+            else{
               node2IdList[idA] = nodes2.length; 
               node1 = {};
               node1.id = idA;
               nodes2.push(node1);
             }
-            else if (node2IdList[idA]>=0){
-              var id = node2IdList[idA];
-              node1 = nodes2[id];
-            }
 
             var node2;  
-            if (!node2IdList[idB]){
+           if (node2IdList[idB]>=0){
+              var id = node2IdList[idB];
+              node2 = nodes2[id];
+            }
+            else{
               node2IdList[idB] = nodes2.length;  
               node2 = {};
               node2.id = idB;
               nodes2.push(node2);
             }
-            else if (node2IdList[idB]>=0){
-              var id = node2IdList[idB];
-              node2 = nodes2[id];
-            }
+            
             if (node1 && node2 && !link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]){
               var l = {};
               l.source = node1;
               l.target = node2;
               l.type = partType;
+              l.cardId = cardId;
               l.cardType = cardType;
               l.year = year;
               l.evidenceText = evidenceText;
@@ -313,13 +308,13 @@ function saveTimeArcsData() {
                 link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType] = 1;
               else
                 link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]++;
-              if (link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]>1){
-                console.log("node1="+node1.id+" node2"+node2.id+ link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]);
-              }
+             // if (link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]>1){
+             //   console.log("node1="+node1.id+" node2"+node2.id+ link2List[node1.id+"**"+node2.id+"**"+partType+"**"+cardType]);
+             // }
             }
           }    
 
-          console.log("nodes2="+nodes2.length+" links2="+links2.length);
+         // console.log("nodes2="+nodes2.length+" links2="+links2.length);
           force
                 .nodes(nodes2)
                 .links(links2)
@@ -423,8 +418,6 @@ function saveTimeArcsData() {
         .style("fill", "#000");  
 
         
-
-
     svg2.append("line")
         .attr("class", "nodeLegend")
         .attr("x1", xx+15)
@@ -565,8 +558,8 @@ function saveTimeArcsData() {
     node2IdList ={};
     link2List = {};
     force = d3.layout.force()
-      .charge(-50)
-      .linkDistance(30)
+      .charge(-40)
+      .linkDistance(22)
       .size([500, 700]);
     if (svg2){
       svg2.selectAll(".node").remove();    

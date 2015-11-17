@@ -41,7 +41,9 @@ app.get("/getEvidencePC", function(request, response) {
        // .filter(function(d){ return d.evidence.some(function(e) {return e.indexOf("Authored:")>-1;}) });
 
         //{$regex : ".*Authored:.*"}
-        return db.collection("pc_cards").find({ "evidence": {$regex : ".*Authored: .*20..-.*"} }).limit(8000).toArray();
+        return db.collection("pc_cards").find({ "evidence": {$regex : ".*Authored: .*, 2014-..-...*"} }).limit(4000).toArray();
+       // return db.collection("pc_cards").find({$and: [{"evidence": {$regex : ".*Authored: .*, 2014-..-...*"} }, 
+       //     {'evidence.1': {$exists: true}}, {'_participant_a_ids.0': {$exists: true}}, {'_participant_b_ids.0': {$exists: true}}]}).limit(10000).toArray();
     })
      .then(function(array) {
         console.log("array="+array.length);
