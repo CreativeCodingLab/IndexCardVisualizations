@@ -36,16 +36,16 @@ The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeA
 
 # Conflicting evidences:
 
- In the following figure, we shows TimeArcs visualization for interactions between OPSD protein and other elements. In particular, we can see there are a few conflicting evidences between 2003 and 2012 publications. We are going to show only one conflicting example between OPSD and K+ which is denoted as (1) and (2) in the following figure. 
+ In the following figure, we shows TimeArcs visualization for interactions between OPSD protein and other elements. In particular, we can see there are a few conflicting evidences between 2003 and 2012 publications. We are going to show only one conflicting example where OPSD and K+ appear both in positive and negative regulations denoted as (1) and (2) in the following figure. 
  
  ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting.png)
 
-1) "Authored: Carleton, KL, 2003-07-31",
+1) "Authored: Carleton, KL, 2003-07-31", "interaction_type" : "adds_modification",
     "Protein phosphatase 2A removes the phosphates from phosphorylated rhodopsin (p MII) and phosphorylated opsin (p-RHO) (Fowles et al. 1989, Palczewski et al. 1989a,b). A Ca2+ dependent opsin phosphatase is also present (Kutuzov & Bennett 1996). Serine/threonine protein phosphatases with EF hands (PPEF1 and 2) that share homology with Drosophila retinal degeneration C (rdgC) are expressed in retina and may be responsible (Huang & Honkanen 1998), there is no evidence for a physiological role in dephosphorylating rhodopsin. Once dephosphorylated, RHO can once again bind the chromophore 11 cis retinal (11cRAL), in readiness for the next photon response. Arrestin (S-antigen or SAG, Yamaki et al. 1988) binds to and sterically caps MII, preventing PPEF1 from dephosphorylating it."
 
 The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting1.json).
 
- (2) "Jassal, Bijay, 2012-11-13",
+ (2) "Jassal, Bijay, 2012-11-13", "interaction_type" : "removes_modification",
     "Activated rhodopsin (MII aka R*) must be deactivated to terminate the single photon response. Deactivation begins during the rising phase of the single photon response after MII binds rhodopsin kinase (GRK1), a serine/threonine protein kinase (Khani et al. 1996). GRK1 is activated by MII whereupon it phosphorylates MII at multiple serine and threonine sites on its C terminus. There are six serine and threonine residues that can be phosphorylated. Increasing phosphorylation progressively reduces the rate at which MII can activate transducin but full quenching requires the binding of arrestin (S-antigen or SAG, Yamaki et al. 1988) which binds to and sterically caps MII (Burns & Pugh 2010, Korenbrot 2012).<br><br>A substantial fraction of rhodopsin kinase (GRK1) is bound to recoverin (RCVRN) in darkness, when internal Ca2+ levels are high. RCVRN is an EF-hand protein (Murakami et al. 1992) that functions as a myristoyl switch. With Ca2+ bound, the myristoyl group is exposed to attach RCVRN to the membrane. When Ca2+ levels drop with light exposure, Ca2+ dissociates from RCVRN and GRK1 is released. Higher levels of free GRK1 accelerate the phosphorylation and shutoff of photoexcited rhodopsin (MII).<br><br>Certain mutations in GRK1 cause Oguchi type 2 disease, a rare, recessive form of congenital stationary night blindness (https://sph.uth.edu/retnet/)."
  
  The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting2.json).
