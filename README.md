@@ -7,5 +7,7 @@ Time axis goes from left (2000) to right (2014). An arc connects two proteins/co
 
 ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary.png)
 
+![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary2.png)
+
 When there are multiple connections (arcs) between two proteins/complexes, it may falls into one of the two following circumstances:
  
