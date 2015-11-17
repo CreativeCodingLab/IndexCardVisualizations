@@ -7,11 +7,11 @@ Time axis goes from left (2000) to right (2014). An arc connects two proteins/co
 
 ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary.png)
 
-For the same amount of data, we can use a force directed layout (without time element) to visualize as depicted in the following image. Over-plotting Protein/Complex labels obscure the base graph, and the labels themselves. In contrast, by organizing text labels vertically (and evenly spaced) and locating them horizontally at the first occurrence (first publication year) reduces the over-plotting problem significantly as depicted in the above picture.  
+For the same amount of data, we can use a force directed layout (without time element) to visualize as depicted in the following image. Over-plotting protein/complex labels obscures the base graph, and the labels themselves. In contrast, by organizing text labels vertically (and evenly spaced) and locating them horizontally at the first occurrence (first publication year), TimeArcs reduces the over-plotting problem significantly as depicted in the above picture.  
 
 ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary2.png)
 
-When there are multiple connections (arcs) between two proteins/complexes, it may falls into one of the two following circumstances: (1) If they have the same color (same interaction type), they are supporting evidences in different publications which confirm the interaction between two elements. (2) If they have the different colors (different interaction types), the latter evidence may adds more knowledge or conflicting the previous publication. We will show an example of each circumstances in the next Section.
+When there are multiple connections (arcs) between two proteins/complexes, it may falls into one of the two following circumstances: (1) If they have the same color (same interaction type), these are supporting evidences in different publications which confirm the interaction between two elements. (2) If they have the different colors (different interaction types), the latter evidence may adds more knowledge or conflicting the previous publication. We will show an example of each circumstances in the next Section.
  
 # Supporting evidences:
  In the following figure, we shows TimeArcs visualization for interactions between PCAF complex and other elements (which are recorded by evidences in Pathway Commons index cards). In particular above PCAF timeline, we can see there are new evidences in 2013 supporting "PCAF binds p300 and KAT3A" which was first discovered in 2011. Similarly under PCAF timeline, there are 3 evidences supporting "PCAF binds MAML" in 2008, 2011, and 2013. Here are the details of these 3 evidences:
