@@ -26,6 +26,8 @@ The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/Ti
  (2) "Authored: Egan, SE, Orlic-Milacic, M, 2011-11-14",
     "TAD and PEST domains of NOTCH intracellular domain contain multiple conserved cyclin-dependent kinase phosphorylation sites. In vitro, recombinant human CDK8 in complex with recombinant human cyclin C (CDK8:CCNC) readily phosphorylates recombinant Xenopus NICD1 (xNICD1). This phosphorylation also occurs when these recombinant proteins are expressed in HeLa cells, and was directly shown to involve conserved serine residues in the PEST domain. Phosphorylation by CDK8 targets xNICD1 for ubiquitination and subsequent degradation, thereby coordinating NICD1 transcriptional activity with NICD1 turnover."
     
+    The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting2.json).
+    
  (3) "Authored: Orlic-Milacic, M, 2013-01-04",
     "While CDK8 can probably phosphorylate the TAD domain of NICD1 PEST domain mutants, it cannot phosphorylate the PEST domain of these mutants as it is partially or completely truncated." 
 
