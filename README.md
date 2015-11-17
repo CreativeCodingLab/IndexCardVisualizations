@@ -31,9 +31,10 @@ The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/Ti
 
 The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting3.json)
 
- 
-    
- 
- 
+
 # Conflicting evidences:
+
+ ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting.png)
+
+
  
