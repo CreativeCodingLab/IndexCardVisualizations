@@ -7,6 +7,7 @@ Time axis goes from left (2000) to right (2014). An arc connects two proteins/co
 
 ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary.png)
 
+For the same amount of data, we can use a force directed layout (without time element) to visualize as depicted in the following image. Over-plotting Protein/Complex labels obscure the base graph, and the labels themselves. In the opposites, by organizing text labels vertically (and evenly spaced) and locating them horizontally at the first occurrence (first publication year) reduces the over-plotting problem significantly.  
 ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/summary2.png)
 
 When there are multiple connections (arcs) between two proteins/complexes, it may falls into one of the two following circumstances:
