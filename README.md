@@ -21,17 +21,17 @@ When there are multiple connections (arcs) between two proteins/complexes, it ma
  (1) "Authored: Caudy, M, 2008-09-05",
     "Mammalian CSL Coactivator Complexes: Upon activation of Notch signaling, cleavage of the transmembrane Notch receptor releases the Notch Intracellular Domain (NICD), which translocates to the nucleus, where it binds to CSL and displaces the corepressor complex from CSL (reviewed in Mumm, 2000 and Kovall, 2007). The resulting CSL-NICD "binary complex" then recruits an additional coactivator, Mastermind (Mam), to form a ternary complex. The ternary complex then recruits additional, more general coactivators, such as CREB Binding Protein (CBP), or the related p300 coactivator, and a number of Histone Acetytransferase (HAT) proteins, including GCN5 and PCAF (Fryer, 2002). There is evidence that Mam also can subsequently recruit specific kinases that phosphorylate NICD, to downregulate its function and turn off Notch signaling (Fryer, 2004)."
 
-The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting1.json).
+The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting1.json).
 
  (2) "Authored: Egan, SE, Orlic-Milacic, M, 2011-11-14",
     "TAD and PEST domains of NOTCH intracellular domain contain multiple conserved cyclin-dependent kinase phosphorylation sites. In vitro, recombinant human CDK8 in complex with recombinant human cyclin C (CDK8:CCNC) readily phosphorylates recombinant Xenopus NICD1 (xNICD1). This phosphorylation also occurs when these recombinant proteins are expressed in HeLa cells, and was directly shown to involve conserved serine residues in the PEST domain. Phosphorylation by CDK8 targets xNICD1 for ubiquitination and subsequent degradation, thereby coordinating NICD1 transcriptional activity with NICD1 turnover."
-    
-The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting2.json).
+ 
+ The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting2.json).
     
  (3) "Authored: Orlic-Milacic, M, 2013-01-04",
     "While CDK8 can probably phosphorylate the TAD domain of NICD1 PEST domain mutants, it cannot phosphorylate the PEST domain of these mutants as it is partially or completely truncated." 
 
-The complete PC card can be downloaded at [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting3.json).
+The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/supporting3.json).
 
 
 # Conflicting evidences:
