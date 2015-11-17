@@ -38,8 +38,17 @@ The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeA
 
  In the following figure, we shows TimeArcs visualization for interactions between OPSD protein and other elements. In particular, we can see there are a few conflicting evidences between 2003 and 2012 publications. We are going to show only one conflicting example between OPSD and K+ which is denoted as (1) and (2) in the following figure. 
  
-  
  ![ScreenShot](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting.png)
 
+1) "Authored: Carleton, KL, 2003-07-31",
+    "Protein phosphatase 2A removes the phosphates from phosphorylated rhodopsin (p MII) and phosphorylated opsin (p-RHO) (Fowles et al. 1989, Palczewski et al. 1989a,b). A Ca2+ dependent opsin phosphatase is also present (Kutuzov & Bennett 1996). Serine/threonine protein phosphatases with EF hands (PPEF1 and 2) that share homology with Drosophila retinal degeneration C (rdgC) are expressed in retina and may be responsible (Huang & Honkanen 1998), there is no evidence for a physiological role in dephosphorylating rhodopsin. Once dephosphorylated, RHO can once again bind the chromophore 11 cis retinal (11cRAL), in readiness for the next photon response. Arrestin (S-antigen or SAG, Yamaki et al. 1988) binds to and sterically caps MII, preventing PPEF1 from dephosphorylating it."
+
+The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting1.json).
+
+ (2) "Authored: Egan, SE, Orlic-Milacic, M, 2011-11-14",
+    "TAD and PEST domains of NOTCH intracellular domain contain multiple conserved cyclin-dependent kinase phosphorylation sites. In vitro, recombinant human CDK8 in complex with recombinant human cyclin C (CDK8:CCNC) readily phosphorylates recombinant Xenopus NICD1 (xNICD1). This phosphorylation also occurs when these recombinant proteins are expressed in HeLa cells, and was directly shown to involve conserved serine residues in the PEST domain. Phosphorylation by CDK8 targets xNICD1 for ubiquitination and subsequent degradation, thereby coordinating NICD1 transcriptional activity with NICD1 turnover."
+ 
+ The complete PC card can be downloaded [here](http://www.cs.uic.edu/~tdang/TimeArcs/imagesForPCcards/conflicting2.json).
+    
 
  
