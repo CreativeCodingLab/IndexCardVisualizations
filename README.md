@@ -12,3 +12,7 @@ For the same amount of data, we can use a force directed layout (without time el
 
 When there are multiple connections (arcs) between two proteins/complexes, it may falls into one of the two following circumstances: (1) If they have the same color (same interaction type), they are supporting evidences in different publications which confirm the interaction between two elements. (2) If they have the different colors (different interaction types), the latter evidence may adds more knowledge or conflicting the previous publication. We will show an example of each circumstances in the next Section.
  
+# Supporting evidences:
+ 
+# Conflicting evidences:
+ 
