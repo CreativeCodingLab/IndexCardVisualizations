@@ -1,0 +1,7 @@
+{
+    "uid": "index-card-vis",
+    "command": "coffee",
+    "script": "server.coffee",
+    "append": true,
+    "args": ["9001"]
+}
