@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.min.js"></script>
+    <div id='app'></div>
+    <script>
+      'use strict';
+      var stream = Rx.Observable;
+
+      const intent = function(DOM$) {
+        let controlToggle$ = DOM$
+          .map(el => el.select('.toggle_controls'))
+          .filter(el => el.on('click') ? false : true)
+          .flatMap(butt => stream.create(observer =>
+            butt.on('click', ev => observer.onNext(ev))
+          ))
+
+        return {controlToggle$}
+      }
+
+      const model = function(actions) {
+        let mainControls$ = stream.just(['toggle_controls'])
+
+        let speedControls$ = actions.controlToggle$
+          .startWith(false)
+          .scan(state => !state)
+          .map(state => state ? ['faster', 'slower'] : [])
+
+        let controls$ = stream.combineLatest(
+          mainControls$,
+          speedControls$,
+          (m,c) => [m,c]
+        )
+
+        return stream.combineLatest(
+          controls$,
+          (controls) =>
+            ({controls})
+        )
+      }
+
+      const view = function(state$) {
+        return state$
+          .map(obj => {
+            return container => {
+
+              let controls = container.selectAll('.controls').data(obj.controls)
+              controls.enter().append('div').classed('controls', true)
+              controls.exit().remove()
+
+              let buttons = controls.selectAll('button').data(d => d)
+              buttons.enter().append('button')
+                .attr('class', d => `btn btn-secondary ${d}`)
+                .text(d => d)
+              buttons.exit().remove()
+
+              return container
+            }
+          })
+      }
+
+      const main = function(response) {
+        const DOM$ = response.DOM$
+        return view(model(intent(DOM$)))
+      }
+
+      const driver = function(request$) {
+        let DOM$ = request$.scan((o,fn) => fn(o), d3.select('#app'))
+        return {
+          DOM$
+        }
+      }
+
+      const sink$ = new Rx.ReplaySubject()
+      const response$ = driver(sink$)
+      const request$ = main(response$)
+      request$.subscribe(sink$.asObserver())
+
+    </script>
+  </body>
+</html>
