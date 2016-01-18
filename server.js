@@ -1,4 +1,4 @@
-var dbRouter = require('./index-card-db-api');
+var dbRouter = require('index-card-db-api');
 
 var express = require('express');
 var app = express();
