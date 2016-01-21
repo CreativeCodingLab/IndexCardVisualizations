@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "rx": "^4.0.7"
+  }
+}

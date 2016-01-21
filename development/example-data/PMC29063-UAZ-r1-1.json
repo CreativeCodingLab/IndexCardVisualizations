@@ -1,0 +1,35 @@
+{
+  "submitter":"Reach",
+  "model_relation":"extension",
+  "extracted_information":{
+    "interaction_type":"binds",
+    "negative_information":false,
+    "participant_b":{
+      "in_model":true,
+      "identifier":"uniprot:P11831",
+      "entity_text":"SRF",
+      "entity_type":"protein"
+    },
+    "participant_a":{
+      "in_model":true,
+      "identifier":"uazid:UAZ00007",
+      "entity_text":"TCFs",
+      "entity_type":"protein"
+    },
+    "hypothesis_information":false,
+    "context":{
+      "CellType":[
+        "uniprot:TS-0923"
+      ]
+    }
+  },
+  "reading_complete":"2016-01-05T23:40:28Z",
+  "reader_type":"machine",
+  "reading_started":"2016-01-05T23:36:05Z",
+  "trigger":"interact",
+  "evidence":[
+    "TCFs and C/EBPbeta have been shown to interact with SRF"
+  ],
+  "pmc_id":"29063",
+  "score":0
+}
